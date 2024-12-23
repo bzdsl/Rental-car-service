@@ -17,6 +17,7 @@ import AdminPage from "../pages/AdminPages/AdminPage";
 import CarManagement from "../pages/AdminPages/CarManagement";
 import UserManagement from "../pages/AdminPages/UserManagement";
 import RentManagement from "../pages/AdminPages/RentManagement";
+
 import Checkout from "../pages/Checkout";
 import EditUserProfile from "../pages/AdminPages/EditUserProfile";
 import EditCar from "../pages/AdminPages/EditCar";
@@ -24,6 +25,7 @@ import CategoryPage from "../pages/CategoryPage";
 import UserEditBooking from "../pages/UserEditBooking";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import { useUserStore } from "../stores/useUserStore";
+import EditBooking from "../pages/AdminPages/EditBooking";
 
 const Routers = () => {
   const { user } = useUserStore();
@@ -89,6 +91,10 @@ const Routers = () => {
       />
       <Route path="/admin/car-management/edit/:id" element={<EditCar />} />
       <Route path="/admin/rent-management" element={<RentManagement />} />
+      <Route
+        path="/admin/rent-management/:edit/:id"
+        element={<EditBooking />}
+      />
     </Routes>
   );
 };

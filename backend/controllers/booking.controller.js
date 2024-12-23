@@ -198,19 +198,22 @@ export const cancelBooking = async (req, res) => {
     const booking = await Booking.findById(bookingId);
 
     if (!booking) {
-      return res.status(404).json({ message: "Không tìm thấy đặt xe" });
+      return res.status(404).json({ message: "Không tìm thấy đơn thuê" });
     }
 
-    // Check if user has permission to cancel
-    if (booking.user.toString() !== req.user._id.toString()) {
+    // Allow admin to cancel any booking
+    if (
+      req.user.role !== "admin" &&
+      (!booking.user || booking.user.toString() !== req.user._id.toString())
+    ) {
       return res
         .status(403)
-        .json({ message: "Bạn không có quyền hủy đặt xe này" });
+        .json({ message: "Bạn không có quyền hủy đơn thuê này" });
     }
 
     // Check if booking can be cancelled (not already completed/cancelled)
     if (["completed", "cancelled"].includes(booking.status)) {
-      return res.status(400).json({ message: "Không thể hủy đặt xe này" });
+      return res.status(400).json({ message: "Không thể hủy đơn thuê này" });
     }
 
     // Update booking status
@@ -218,12 +221,12 @@ export const cancelBooking = async (req, res) => {
     await booking.save();
 
     res.status(200).json({
-      message: "Hủy đặt xe thành công",
+      message: "Hủy đơn thuê thành công",
       booking,
     });
   } catch (error) {
     res.status(500).json({
-      message: "Lỗi hủy đặt xe",
+      message: "Lỗi hủy đơn thuê",
       error: error.message,
     });
   }
@@ -322,12 +325,12 @@ export const editBooking = async (req, res) => {
     await booking.save();
 
     res.status(200).json({
-      message: "Cập nhật thông tin thành công",
+      message: "Cập nhật thông tin đơn thuê thành công",
       booking,
     });
   } catch (error) {
     res.status(500).json({
-      message: "Lỗi khi cập nhật thông tin ",
+      message: "Lỗi khi cập nhật thông tin đơn thuê",
       error: error.message,
     });
   }

@@ -33,7 +33,7 @@ const RentManagement = () => {
     fetchBookings();
   }, []);
 
-  // Update booking status - using existing endpoints
+  // Update booking status - using existing endpoints// Update booking status - using existing endpoints
   const updateBookingStatus = async (bookingId, newStatus) => {
     try {
       if (newStatus === "cancelled") {
@@ -50,6 +50,8 @@ const RentManagement = () => {
       setError(
         err.response?.data?.message || "Failed to update booking status"
       );
+      // Thêm thông báo lỗi cho người dùng
+      alert(err.response?.data?.message || "Failed to update booking status");
     }
   };
 
