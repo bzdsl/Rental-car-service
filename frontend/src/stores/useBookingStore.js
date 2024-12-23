@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import axiosInstance from "../lib/axios";
-import { differenceInDays } from "date-fns";
+import { differenceInDays, startOfDay } from "date-fns";
 
 export const useBookingStore = create((set, get) => ({
   // Booking History State
@@ -18,6 +18,8 @@ export const useBookingStore = create((set, get) => ({
     email: "",
     phoneNumber: "",
     pickupLocation: "",
+    pickupTime: "", // New field
+    notes: "", // New field
     discountCode: "",
   },
   pricing: {
@@ -38,42 +40,13 @@ export const useBookingStore = create((set, get) => ({
     set({ loading: true });
     try {
       const response = await axiosInstance.get("/bookings/my-bookings");
-      console.log("Fetched bookings:", response.data); // Log fetched bookings
+      console.log("Fetched bookings:", response.data);
       set({ bookings: response.data, loading: false });
     } catch (err) {
       console.error("Error fetching bookings:", err);
-      set({ error: "", loading: false });
+      set({ error: err.message || "Error fetching bookings", loading: false });
     }
   },
-
-  // cancelBooking: async (bookingId) => {
-  //   set({ loading: true, error: null, successMessage: "" });
-  //   try {
-  //     await axiosInstance.put(`/bookings/${bookingId}/cancel`);
-  //     set({ successMessage: "Booking cancelled successfully" });
-  //     // Fetch updated bookings
-  //     const response = await axiosInstance.get("/bookings");
-  //     set({ bookings: response.data, loading: false });
-  //   } catch (err) {
-  //     console.error("Error cancelling booking:", err);
-  //     set({ error: "Failed to cancel booking", loading: false });
-  //   }
-  // },
-  // cancelBooking: async (bookingId) => {
-  //   try {
-  //     await axios.put(`/api/bookings/${bookingId}/cancel`, null, {
-  //       headers: {
-  //         Authorization: `Bearer ${userToken}`, // Ensure the userToken is available
-  //       },
-  //     });
-  //     // Re-fetch bookings after successful cancellation
-  //     fetchBookings();
-  //   } catch (error) {
-  //     set({
-  //       error: error.response?.data?.message || "Failed to cancel booking",
-  //     });
-  //   }
-  // },
 
   clearMessages: () => set({ error: null, successMessage: "" }),
 
@@ -84,11 +57,12 @@ export const useBookingStore = create((set, get) => ({
       return;
     }
 
-    const start = new Date(dates[0]);
-    const end = new Date(dates[1]);
+    const start = startOfDay(new Date(dates[0]));
+    const end = startOfDay(new Date(dates[1]));
 
-    if (start >= end) {
-      console.warn("Start date must be before end date");
+    // Allow same-day bookings, but prevent end date before start date
+    if (end < start) {
+      console.warn("Ngày kết thúc không thể trước ngày bắt đầu");
       return;
     }
 
@@ -97,14 +71,12 @@ export const useBookingStore = create((set, get) => ({
 
   validateRentalDates: () => {
     const { rentalDates } = get();
-    if (!rentalDates || rentalDates.length !== 2) {
-      return false;
-    }
+    if (!rentalDates || rentalDates.length !== 2) return false;
 
-    const start = new Date(rentalDates[0]);
-    const end = new Date(rentalDates[1]);
+    const start = startOfDay(new Date(rentalDates[0]));
+    const end = startOfDay(new Date(rentalDates[1]));
 
-    return !isNaN(start) && !isNaN(end) && start < end;
+    return !isNaN(start) && !isNaN(end) && end >= start;
   },
 
   calculatePricing: (basePrice, discountCode = "", days = 0) => {
@@ -146,6 +118,8 @@ export const useBookingStore = create((set, get) => ({
         email: "",
         phoneNumber: "",
         pickupLocation: "",
+        pickupTime: "",
+        notes: "",
         discountCode: "",
       },
       pricing: {
@@ -158,9 +132,10 @@ export const useBookingStore = create((set, get) => ({
 
   validateBookingData: () => {
     const { formData, rentalDates } = get();
-    const { fullName, email, phoneNumber, pickupLocation } = formData;
+    const { fullName, email, phoneNumber, pickupLocation, pickupTime } =
+      formData;
 
-    if (!fullName || !email || !phoneNumber || !pickupLocation) {
+    if (!fullName || !email || !phoneNumber || !pickupLocation || !pickupTime) {
       console.error("Vui lòng điền đầy đủ thông tin");
       return false;
     }
@@ -187,19 +162,18 @@ export const useBookingStore = create((set, get) => ({
   },
 
   calculateInitialPricing: (car, rentalDates) => {
-    if (!car || !rentalDates || rentalDates.length !== 2) {
-      return false;
-    }
+    if (!car || !rentalDates || rentalDates.length !== 2) return false;
 
     try {
-      const startDate = new Date(rentalDates[0]);
-      const endDate = new Date(rentalDates[1]);
+      const startDate = startOfDay(new Date(rentalDates[0]));
+      const endDate = startOfDay(new Date(rentalDates[1]));
 
       if (isNaN(startDate) || isNaN(endDate)) {
         console.error("Invalid rental dates");
         return false;
       }
 
+      // Include both start and end dates in calculation
       const days = differenceInDays(endDate, startDate) + 1;
       const totalBasePrice = car.price * days;
 
@@ -214,15 +188,15 @@ export const useBookingStore = create((set, get) => ({
   prepareBookingData: (carId) => {
     const { formData, rentalDates, pricing, validateBookingData } = get();
 
-    if (!validateBookingData()) {
-      return null;
-    }
+    if (!validateBookingData()) return null;
 
     return {
       carId,
       startDate: rentalDates[0],
       endDate: rentalDates[1],
       pickupLocation: formData.pickupLocation,
+      pickupTime: formData.pickupTime,
+      notes: formData.notes,
       fullName: formData.fullName,
       email: formData.email,
       phoneNumber: formData.phoneNumber,

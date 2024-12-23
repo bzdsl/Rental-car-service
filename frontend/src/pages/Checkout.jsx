@@ -8,6 +8,7 @@ import Header from "../components/header/Header";
 import Footer from "../components/Footer/Footer";
 import { useCarStore } from "../stores/useCarStore";
 import { useBookingStore } from "../stores/useBookingStore";
+import { useUserStore } from "../stores/useUserStore";
 import axiosInstance from "../lib/axios";
 import { getStripe } from "../lib/stripe";
 
@@ -15,6 +16,7 @@ const Checkout = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { cars, selectedCar, setSelectedCar } = useCarStore();
+  const { user, checkingAuth } = useUserStore();
   const {
     rentalDates,
     formData,
@@ -49,6 +51,14 @@ const Checkout = () => {
     calculateInitialPricing,
   ]);
 
+  // Check authentication status
+  useEffect(() => {
+    if (!checkingAuth && !user) {
+      // message.error("Vui lòng đăng nhập để tiếp tục thanh toán");
+      navigate("/login", { state: { from: `/checkout/${slug}` } });
+    }
+  }, [user, checkingAuth, navigate, slug]);
+
   const handleDiscountCode = () => {
     const success = applyDiscountCode(discountCode);
     if (success) {
@@ -63,6 +73,12 @@ const Checkout = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isProcessing) return;
+
+    if (!user) {
+      message.error("Vui lòng đăng nhập để tiếp tục thanh toán");
+      navigate("/login", { state: { from: `/checkout/${slug}` } });
+      return;
+    }
 
     setIsProcessing(true);
     const bookingData = prepareBookingData(selectedCar._id);
@@ -85,10 +101,11 @@ const Checkout = () => {
             },
           ],
           couponCode: discountCode,
-          // Add these fields
           startDate: rentalDates[0],
           endDate: rentalDates[1],
           pickupLocation: formData.pickupLocation,
+          pickupTime: formData.pickupTime,
+          notes: formData.notes,
           totalPrice: pricing.totalPrice,
         }
       );
@@ -111,11 +128,38 @@ const Checkout = () => {
     }
   };
 
+  if (checkingAuth) {
+    return <div>Đang tải...</div>;
+  }
+
+  if (!user) {
+    return (
+      <>
+        <Header />
+        <Container className="mt-5">
+          <div className="text-center py-5">
+            <h2>Vui lòng đăng nhập</h2>
+            <p>Bạn cần đăng nhập để tiếp tục thanh toán</p>
+            <button
+              className="btn btn-primary"
+              onClick={() =>
+                navigate("/login", { state: { from: `/checkout/${slug}` } })
+              }>
+              Đăng nhập ngay
+            </button>
+          </div>
+        </Container>
+        <Footer />
+      </>
+    );
+  }
+
   if (!selectedCar) {
     return <div>Đang tải...</div>;
   }
+
   const formatUSD = (vndAmount) => {
-    const VND_TO_USD = 0.000041; // Should match backend rate
+    const VND_TO_USD = 0.000041;
     const usdAmount = vndAmount * VND_TO_USD;
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -171,7 +215,25 @@ const Checkout = () => {
                   required
                 />
               </FormGroup>
+              <FormGroup>
+                <Label>Thời gian nhận xe *</Label>
+                <Input
+                  type="time"
+                  value={formData.pickupTime}
+                  onChange={(e) => updateFormData("pickupTime", e.target.value)}
+                  required
+                />
+              </FormGroup>
 
+              <FormGroup>
+                <Label>Ghi chú</Label>
+                <Input
+                  type="textarea"
+                  value={formData.notes}
+                  onChange={(e) => updateFormData("notes", e.target.value)}
+                  rows="3"
+                />
+              </FormGroup>
               <FormGroup>
                 <Label>Mã Giảm Giá</Label>
                 <div className="d-flex">

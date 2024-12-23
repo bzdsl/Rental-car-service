@@ -9,7 +9,14 @@ import { stripe } from "../lib/stripe.js";
 export const createCheckoutSession = async (req, res) => {
   try {
     const { cars, couponCode } = req.body;
-    const { startDate, endDate, pickupLocation, totalPrice } = req.body;
+    const {
+      startDate,
+      endDate,
+      pickupLocation,
+      pickupTime,
+      notes,
+      totalPrice,
+    } = req.body;
 
     // Convert VND to USD only for Stripe payment
     const VND_TO_USD = 0.000041;
@@ -42,6 +49,8 @@ export const createCheckoutSession = async (req, res) => {
           startDate,
           endDate,
           pickupLocation,
+          pickupTime, // New field
+          notes, // New field
           totalPrice,
         }),
       },
@@ -88,6 +97,8 @@ export const checkoutSuccess = async (req, res) => {
         startDate: new Date(bookingData.startDate),
         endDate: new Date(bookingData.endDate),
         pickupLocation: bookingData.pickupLocation,
+        pickupTime: bookingData.pickupTime, // New field
+        notes: bookingData.notes, // New field
         totalPrice: bookingData.totalPrice,
         status: "confirmed",
         stripeSessionId: sessionId, // Make sure this field exists in your Booking model
@@ -109,21 +120,6 @@ export const checkoutSuccess = async (req, res) => {
       message: "Failed to process successful checkout",
       error: error.message,
     });
-  }
-};
-
-// Rest of the controller remains the same...
-// Utility to create a Stripe coupon
-const createStripeCoupon = async (discountPercentage) => {
-  try {
-    const coupon = await stripe.coupons.create({
-      percent_off: discountPercentage,
-      duration: "once",
-    });
-    return coupon.id;
-  } catch (error) {
-    console.error("Error creating Stripe coupon:", error.message);
-    throw new Error("Failed to create Stripe coupon");
   }
 };
 

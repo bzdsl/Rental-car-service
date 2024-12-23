@@ -1,6 +1,5 @@
 /** @format */
 
-// CarDetails component
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "reactstrap";
@@ -10,8 +9,8 @@ import Footer from "../components/Footer/Footer";
 import CommentSection from "../components/UI/CommentSection";
 import { useCarStore } from "../stores/useCarStore";
 import { useBookingStore } from "../stores/useBookingStore";
-import axiosInstance from "../lib/axios"; // Custom axios instance
-import { format } from "date-fns";
+import axiosInstance from "../lib/axios";
+import { format, startOfDay } from "date-fns";
 import DatePicker from "react-datepicker";
 import { message } from "antd";
 import "react-datepicker/dist/react-datepicker.css";
@@ -30,36 +29,47 @@ const CarDetails = () => {
     }
   }, [fetchAllCars, cars.length]);
 
-  // CarDetails component: handleStartDateChange and handleEndDateChange
+  // Handle start date change
   const handleStartDateChange = (date) => {
     if (date) {
-      const formattedStartDate = format(date, "yyyy-MM-dd");
-      setRentalDates([formattedStartDate, rentalDates[1]]);
+      // Convert to start of day to ensure consistent date comparison
+      const normalizedDate = startOfDay(date);
+      const formattedStartDate = format(normalizedDate, "yyyy-MM-dd");
+
+      // If no end date is set or end date is before new start date, set end date to start date
+      if (!rentalDates[1] || new Date(rentalDates[1]) < normalizedDate) {
+        setRentalDates([formattedStartDate, formattedStartDate]);
+      } else {
+        setRentalDates([formattedStartDate, rentalDates[1]]);
+      }
     }
   };
 
+  // Handle end date change
   const handleEndDateChange = (date) => {
     if (date) {
-      const formattedEndDate = format(date, "yyyy-MM-dd");
-      setRentalDates([rentalDates[0], formattedEndDate]);
+      // Convert to start of day to ensure consistent date comparison
+      const normalizedDate = startOfDay(date);
+      const formattedEndDate = format(normalizedDate, "yyyy-MM-dd");
+
+      if (!rentalDates[0]) {
+        // If no start date is set, set both dates to the selected end date
+        setRentalDates([formattedEndDate, formattedEndDate]);
+      } else {
+        // Check if end date is before start date
+        if (normalizedDate < startOfDay(new Date(rentalDates[0]))) {
+          message.error("Ngày kết thúc không thể trước ngày bắt đầu");
+          return;
+        }
+        setRentalDates([rentalDates[0], formattedEndDate]);
+      }
     }
   };
 
   // Check Car Availability
   const checkCarAvailability = async () => {
-    if (!rentalDates || rentalDates.length !== 2) {
+    if (!rentalDates[0] || !rentalDates[1]) {
       message.error("Vui lòng chọn đầy đủ ngày bắt đầu và kết thúc");
-      return false;
-    }
-
-    const [startDate, endDate] = rentalDates;
-
-    // Validate date logic
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    if (start >= end) {
-      message.error("Ngày bắt đầu phải trước ngày kết thúc");
       return false;
     }
 
@@ -68,8 +78,8 @@ const CarDetails = () => {
         "/bookings/check-availability",
         {
           carId: slug,
-          startDate,
-          endDate,
+          startDate: rentalDates[0],
+          endDate: rentalDates[1],
         }
       );
 
@@ -94,8 +104,6 @@ const CarDetails = () => {
     const isAvailable = await checkCarAvailability();
     if (isAvailable) {
       navigate(`/checkout/${slug}`);
-    } else {
-      message.warning("Xe không khả dụng. Vui lòng chọn ngày khác.");
     }
   };
 
@@ -117,7 +125,12 @@ const CarDetails = () => {
               </Col>
               <Col lg="6">
                 <div className="car__info">
-                  <h2 className="section__title">{singleCarItem.name}</h2>
+                  <h2
+                    className="section__title fw-bold"
+                    style={{ color: "#000d6b" }}>
+                    {singleCarItem.brand} {singleCarItem.name}
+                  </h2>
+
                   <h6 className="rent__price fw-bold fs-4">
                     {singleCarItem.price.toLocaleString()}đ/ngày
                   </h6>
@@ -139,7 +152,7 @@ const CarDetails = () => {
                     </span>
                   </div>
 
-                  <div className="mt-4">
+                  <div className="d-flex flex-column flex-md-row align-items-center mt-4 gap-3">
                     <DatePicker
                       selected={
                         rentalDates[0] ? new Date(rentalDates[0]) : null
@@ -147,7 +160,10 @@ const CarDetails = () => {
                       onChange={handleStartDateChange}
                       dateFormat="dd/MM/yyyy"
                       placeholderText="Ngày bắt đầu"
+                      className="form-control"
+                      minDate={startOfDay(new Date())}
                     />
+
                     <DatePicker
                       selected={
                         rentalDates[1] ? new Date(rentalDates[1]) : null
@@ -155,14 +171,24 @@ const CarDetails = () => {
                       onChange={handleEndDateChange}
                       dateFormat="dd/MM/yyyy"
                       placeholderText="Ngày kết thúc"
-                      style={{ marginLeft: "10px" }}
+                      className="form-control"
+                      minDate={
+                        rentalDates[0]
+                          ? new Date(rentalDates[0])
+                          : startOfDay(new Date())
+                      }
                     />
+
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleRentClick}
+                      style={{
+                        backgroundColor: "#000d6b",
+                        borderColor: "#000d6b",
+                      }}>
+                      Thuê xe
+                    </button>
                   </div>
-                  <button
-                    className="btn btn-primary mt-4"
-                    onClick={handleRentClick}>
-                    Thuê xe
-                  </button>
                 </div>
               </Col>
             </Row>

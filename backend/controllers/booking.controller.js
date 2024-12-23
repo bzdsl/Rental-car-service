@@ -3,6 +3,7 @@
 // bookingController.js
 import Booking from "../models/booking.model.js";
 import Car from "../models/car.model.js";
+import User from "../models/user.model.js";
 import mongoose from "mongoose";
 
 export const checkBookingAvailability = async (req, res) => {
@@ -21,7 +22,7 @@ export const checkBookingAvailability = async (req, res) => {
     }
 
     // Validate that start date is before end date
-    if (start >= end) {
+    if (start > end) {
       return res.status(400).json({
         isAvailable: false,
         message: "Ngày bắt đầu phải trước ngày kết thúc",
@@ -88,8 +89,16 @@ export const createBooking = async (req, res) => {
   session.startTransaction();
 
   try {
-    const { carId, startDate, endDate, pickupLocation, coupon, totalPrice } =
-      req.body;
+    const {
+      carId,
+      startDate,
+      endDate,
+      pickupLocation,
+      pickupTime, // New field
+      notes, // New field
+      coupon,
+      totalPrice,
+    } = req.body;
 
     // Validate input dates
     const start = new Date(startDate);
@@ -132,6 +141,8 @@ export const createBooking = async (req, res) => {
       startDate: start,
       endDate: end,
       pickupLocation,
+      pickupTime,
+      notes,
       coupon,
       totalPrice,
       status: "pending",
@@ -223,12 +234,9 @@ export const updateBookingStatus = async (req, res) => {
     const { status } = req.body;
 
     // Kiểm tra quyền admin
-    if (!req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Không có quyền thực hiện thao tác này" });
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Không có quyền truy cập" });
     }
-
     const booking = await Booking.findById(bookingId);
     if (!booking) {
       return res.status(404).json({ message: "Không tìm thấy đặt xe" });
@@ -262,6 +270,64 @@ export const getAllBookings = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Lỗi lấy danh sách đặt xe",
+      error: error.message,
+    });
+  }
+};
+
+export const getBookingById = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id)
+      .populate("car", "name image price")
+      .populate("user", "fullName email phone");
+
+    if (!booking) {
+      return res.status(404).json({ message: "Không tìm thấy đơn thuê" });
+    }
+
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(500).json({
+      message: "Lỗi khi lấy thông tin đơn thuê",
+      error: error.message,
+    });
+  }
+};
+
+export const editBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { fullName, email, phone, pickupLocation, pickupTime, notes } =
+      req.body;
+
+    const booking = await Booking.findById(id);
+    if (!booking) {
+      return res.status(404).json({ message: "Không tìm thấy đơn thuê" });
+    }
+
+    // Cập nhật thông tin người dùng nếu có
+    if (booking.user) {
+      await User.findByIdAndUpdate(booking.user, {
+        fullName,
+        email,
+        phone,
+      });
+    }
+
+    // Cập nhật thông tin đơn thuê
+    booking.pickupLocation = pickupLocation;
+    booking.pickupTime = pickupTime;
+    booking.notes = notes;
+
+    await booking.save();
+
+    res.status(200).json({
+      message: "Cập nhật thông tin thành công",
+      booking,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Lỗi khi cập nhật thông tin ",
       error: error.message,
     });
   }

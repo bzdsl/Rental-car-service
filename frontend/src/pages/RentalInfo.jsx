@@ -2,15 +2,17 @@
 
 // src/Pages/RentalInfo.jsx
 import React, { useEffect, useState } from "react";
-import Header from "../components/Header/Header";
+import { useNavigate } from "react-router-dom";
 import { Spinner, Alert, Button, Modal } from "react-bootstrap";
 import {
   useBookingStore,
   formatPrice,
   formatDate,
 } from "../stores/useBookingStore";
+import Header from "../components/Header/Header";
 
 const RentalInfo = () => {
+  const navigate = useNavigate();
   const {
     bookings,
     error,
@@ -27,9 +29,6 @@ const RentalInfo = () => {
   useEffect(() => {
     fetchBookings();
   }, []);
-  useEffect(() => {
-    console.log(bookings); // Check if bookings data is duplicated
-  }, [bookings]);
 
   useEffect(() => {
     return () => clearMessages();
@@ -40,6 +39,10 @@ const RentalInfo = () => {
       cancelBooking(selectedBooking._id);
     }
     setShowModal(false);
+  };
+
+  const handleEdit = (bookingId) => {
+    navigate(`/user-edit-booking/${bookingId}`);
   };
 
   if (loading) {
@@ -98,7 +101,12 @@ const RentalInfo = () => {
                 </div>
               </div>
 
-              {booking.status === "pending" && (
+              <div className="d-flex flex-column gap-2">
+                <Button
+                  variant="primary"
+                  onClick={() => handleEdit(booking._id)}>
+                  Chỉnh sửa
+                </Button>
                 <Button
                   variant="danger"
                   onClick={() => {
@@ -107,7 +115,7 @@ const RentalInfo = () => {
                   }}>
                   Hủy
                 </Button>
-              )}
+              </div>
             </div>
           ))}
 

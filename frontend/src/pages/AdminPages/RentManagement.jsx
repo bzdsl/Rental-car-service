@@ -5,6 +5,7 @@ import "../../styles/AdminStyle/adminpage.css";
 import { Alert, Button, Modal, Spinner } from "react-bootstrap";
 import axiosInstance from "../../lib/axios";
 import { formatDate, formatPrice } from "../../stores/useBookingStore";
+import { useNavigate } from "react-router-dom";
 
 const RentManagement = () => {
   const [bookings, setBookings] = useState([]);
@@ -12,6 +13,7 @@ const RentManagement = () => {
   const [error, setError] = useState(null);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const navigate = useNavigate();
 
   // Fetch all bookings - using existing endpoint
   const fetchBookings = async () => {
@@ -80,9 +82,9 @@ const RentManagement = () => {
       <div className="admin-section p-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="section-title">Quản lý thuê xe</h2>
-          <Button variant="primary" onClick={() => fetchBookings()}>
+          {/* <Button variant="primary" onClick={() => fetchBookings()}>
             Refresh
-          </Button>
+          </Button> */}
         </div>
 
         {error && <Alert variant="danger">{error}</Alert>}
@@ -106,7 +108,7 @@ const RentManagement = () => {
                 <tr key={booking._id}>
                   <td>{booking._id.slice(-6).toUpperCase()}</td>
                   <td>
-                    <div>{booking.fullName}</div>
+                    {/* <div>{booking.fullName}</div> */}
                     <small className="text-muted">{booking.email}</small>
                   </td>
                   <td>{booking.car?.name || "N/A"}</td>
@@ -118,16 +120,27 @@ const RentManagement = () => {
                       {booking.status}
                     </span>
                   </td>
+
                   <td>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedBooking(booking);
-                        setShowStatusModal(true);
-                      }}>
-                      Cập nhật
-                    </Button>
+                    <div className="d-flex gap-2">
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedBooking(booking);
+                          setShowStatusModal(true);
+                        }}>
+                        Cập nhật
+                      </Button>
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() =>
+                          navigate(`/admin/rent-management/edit/${booking._id}`)
+                        }>
+                        Chỉnh sửa
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}

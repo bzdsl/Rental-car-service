@@ -21,6 +21,7 @@ import Checkout from "../pages/Checkout";
 import EditUserProfile from "../pages/AdminPages/EditUserProfile";
 import EditCar from "../pages/AdminPages/EditCar";
 import CategoryPage from "../pages/CategoryPage";
+import UserEditBooking from "../pages/UserEditBooking";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import { useUserStore } from "../stores/useUserStore";
 
@@ -51,6 +52,11 @@ const Routers = () => {
         path="/register"
         element={!user ? <Register /> : <Navigate to="/home" />}
       />
+      <Route
+        path="/user-edit-booking/:bookingId"
+        element={<UserEditBooking />}
+      />
+
       <Route
         path="/login"
         element={

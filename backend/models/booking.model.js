@@ -12,7 +12,7 @@ const bookingSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: false, // Optional for guest bookings
+      required: false,
     },
     startDate: {
       type: Date,
@@ -21,6 +21,16 @@ const bookingSchema = new mongoose.Schema(
     endDate: {
       type: Date,
       required: true,
+    },
+    pickupTime: {
+      // New field
+      type: String,
+      required: true,
+    },
+    notes: {
+      // New field
+      type: String,
+      required: false,
     },
     status: {
       type: String,
@@ -37,8 +47,8 @@ const bookingSchema = new mongoose.Schema(
     },
     stripeSessionId: {
       type: String,
-      unique: true, // This ensures no duplicate bookings for the same session
-      sparse: true, // This allows null values while maintaining uniqueness
+      unique: true,
+      sparse: true,
     },
   },
   { timestamps: true }
