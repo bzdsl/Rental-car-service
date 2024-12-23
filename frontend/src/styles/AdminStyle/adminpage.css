@@ -1,0 +1,107 @@
+/** @format */
+
+.admin-page {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
+
+.admin-sidebar {
+  width: 200px;
+  background-color: #f8f9fa;
+  padding: 20px;
+}
+
+.admin-sidebar-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.admin-sidebar-menu {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.admin-sidebar-link {
+  text-decoration: none;
+  color: #000;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 20px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between; /* Keep elements at the edges */
+  align-items: center; /* Align items vertically in the center */
+  padding: 10px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+}
+
+.admin-header-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.admin-header-logout {
+  margin: 0;
+  display: flex;
+  justify-content: flex-end; /* Ensure the logout button is aligned to the right */
+}
+
+.admin-header-logout button {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.admin-overview {
+  margin-bottom: 20px;
+}
+
+.admin-overview-cards {
+  display: flex;
+  justify-content: space-between;
+}
+
+.admin-overview-card {
+  background-color: #e9ecef;
+  padding: 20px;
+  width: 30%;
+  text-align: center;
+}
+
+.admin-section {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.admin-table {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.admin-add-btn {
+  margin-bottom: 20px;
+}
+
+.admin-delete-btn,
+.admin-deactivate-btn {
+  margin-left: 10px;
+}
+
+.admin-car-image {
+  width: 50px; /* Adjust size as needed */
+  height: 50px;
+  object-fit: cover; /* Ensures the image covers the area without distortion */
+}

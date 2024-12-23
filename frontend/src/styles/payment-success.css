@@ -1,0 +1,27 @@
+/**
+ * @format
+ */
+
+.payment-success-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f6f9fc; /* Màu nền nhẹ */
+  padding: 20px;
+}
+
+.ant-result-title {
+  font-size: 24px;
+  color: #3b5998; /* Màu xanh nổi bật */
+}
+
+.ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.ant-btn-primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}

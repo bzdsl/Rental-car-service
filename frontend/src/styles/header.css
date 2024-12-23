@@ -1,0 +1,275 @@
+/** @format */
+
+/* ============ header middle style =========== */
+
+.header__middle {
+  padding: 15px 0px;
+}
+
+.logo h1 a span {
+  font-size: 1.5rem;
+}
+
+.logo h1 a i {
+  font-size: 2.2rem;
+}
+
+.logo h1 a {
+  text-decoration: none;
+  color: #05060a;
+  font-weight: 700;
+}
+
+.logo h1 {
+  line-height: 1.5rem;
+}
+
+.header__location span i {
+  font-size: 2.2rem;
+  color: #05060a;
+}
+
+.header__location-content h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #05060a;
+}
+
+.header__location-content h6 {
+  font-weight: 600;
+}
+
+/* .header__btn {
+  background: #000d6b !important;
+  padding: 10px 20px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+}
+
+.header__btn a {
+  display: flex;
+  align-items: center;
+  column-gap: 0.4rem;
+  text-decoration: none;
+  color: #fff;
+  justify-content: end;
+  font-size: 0.9rem;
+}
+
+.header__btn a:hover {
+  color: #fff;
+} */
+
+.header__btn {
+  margin-left: 10px;
+  padding: 10px 20px;
+  border: 2px solid #000d6b;
+  background-color: #fff !important; /* Ghi đè màu nền */
+  color: #000d6b !important; /* Ghi đè màu chữ */
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-weight: 600;
+}
+
+.header__btn:hover {
+  background-color: #fff !important;
+  color: #f9a826 !important;
+}
+
+.header__btn:active {
+  background-color: #fff !important;
+  color: #f9a826 !important;
+}
+
+/* Add this to your header.css or a relevant CSS file */
+.no-wrap-button {
+  white-space: nowrap; /* Prevents the text from wrapping */
+}
+
+/* .btn-secondary {
+  background-color: #fff !important;
+  color: #000d6b !important;
+  border: 2px solid #000d6b !important;
+} */
+
+.btn-login {
+  background: #000d6b !important;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-register {
+  background: #000d6b !important;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.btn-reset-password {
+  background: #000d6b !important;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.btn-link {
+  padding: 0;
+  text-decoration: none;
+  color: #007bff;
+}
+
+.btn-link:hover {
+  background-color: #000d6b !important;
+}
+
+/* ================ main navbar styles =========== */
+
+.main__navbar {
+  padding: 15px 0px;
+  background: #000d6b;
+}
+
+.mobile__menu i {
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.mobile__menu {
+  display: none;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  column-gap: 2.7rem;
+}
+
+.nav__item {
+  color: #fff;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.nav__item:hover {
+  color: #f9a826;
+}
+
+.search__box {
+  border: 1px solid #7c8a972f;
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  border-radius: 50px;
+  background: #020a4de9;
+}
+
+.search__box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.search__box input::placeholder {
+  font-size: 0.8rem;
+}
+.search__box span i {
+  color: rgba(255, 255, 255, 0.555);
+  cursor: pointer;
+}
+
+.nav__active {
+  color: #f9a826;
+}
+
+.popup__form {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup__content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  text-align: center;
+}
+
+.popup__content h3 {
+  margin-bottom: 20px;
+}
+
+.popup__content .form__group {
+  margin-bottom: 15px;
+}
+
+.popup__content .btn {
+  margin-top: 10px;
+  width: 100%;
+}
+
+@media only screen and (max-width: 768px) {
+  .header__top,
+  .header__middle,
+  .nav__right {
+    display: none;
+  }
+
+  .mobile__menu {
+    display: block;
+  }
+
+  .navigation {
+    background: rgb(0, 13, 107, 0.6);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: none;
+  }
+
+  .menu {
+    width: 250px;
+    height: 100%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    row-gap: 2rem;
+    justify-content: center;
+  }
+
+  .menu a {
+    color: #000d6b;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .menu__active {
+    display: block;
+  }
+}
