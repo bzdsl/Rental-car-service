@@ -28,9 +28,9 @@ const EditBooking = () => {
         const response = await axiosInstance.get(`/bookings/${id}`);
         setBooking(response.data);
         setFormData({
-          fullName: response.data.user?.fullName || "",
-          email: response.data.user?.email || "",
-          phone: response.data.user?.phone || "",
+          fullName: response.data.fullName || "", // Dữ liệu từ bảng bookings
+          email: response.data.email || "", // Dữ liệu từ bảng bookings
+          phone: response.data.phone || "", // Dữ liệu từ bảng bookings
           pickupLocation: response.data.pickupLocation || "",
           pickupTime: response.data.pickupTime || "",
           notes: response.data.notes || "",
@@ -117,7 +117,7 @@ const EditBooking = () => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Thời gian đón</Form.Label>
+            <Form.Label>Thời gian nhận xe</Form.Label>
             <Form.Control
               type="time"
               name="pickupTime"
@@ -172,7 +172,7 @@ const EditBooking = () => {
             </Button>
             <Button
               variant="secondary"
-              onClick={() => navigate("/admin/bookings")}>
+              onClick={() => navigate("/admin/rent-management")}>
               Hủy
             </Button>
           </div>

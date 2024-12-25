@@ -13,6 +13,8 @@ export const createCheckoutSession = async (req, res) => {
       startDate,
       endDate,
       pickupLocation,
+      email,
+      phone,
       pickupTime,
       notes,
       totalPrice,
@@ -49,6 +51,8 @@ export const createCheckoutSession = async (req, res) => {
           startDate,
           endDate,
           pickupLocation,
+          email,
+          phone,
           pickupTime, // New field
           notes, // New field
           totalPrice,
@@ -97,11 +101,13 @@ export const checkoutSuccess = async (req, res) => {
         startDate: new Date(bookingData.startDate),
         endDate: new Date(bookingData.endDate),
         pickupLocation: bookingData.pickupLocation,
-        pickupTime: bookingData.pickupTime, // New field
-        notes: bookingData.notes, // New field
+        pickupTime: bookingData.pickupTime,
+        notes: bookingData.notes,
         totalPrice: bookingData.totalPrice,
-        status: "confirmed",
-        stripeSessionId: sessionId, // Make sure this field exists in your Booking model
+        email: bookingData.email, // Thêm email
+        phone: bookingData.phone, // Thêm phone
+        status: "pending",
+        stripeSessionId: sessionId,
       });
 
       await newBooking.save();

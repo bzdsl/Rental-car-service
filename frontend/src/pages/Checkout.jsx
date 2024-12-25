@@ -103,6 +103,8 @@ const Checkout = () => {
           couponCode: discountCode,
           startDate: rentalDates[0],
           endDate: rentalDates[1],
+          email: formData.email,
+          phone: formData.phone,
           pickupLocation: formData.pickupLocation,
           pickupTime: formData.pickupTime,
           notes: formData.notes,
@@ -175,7 +177,7 @@ const Checkout = () => {
           <Col lg="8">
             <h2 className="mb-4">Thanh Toán Thuê Xe</h2>
             <Form onSubmit={handleSubmit}>
-              <FormGroup>
+              {/* <FormGroup>
                 <Label>Họ và Tên</Label>
                 <Input
                   type="text"
@@ -183,7 +185,7 @@ const Checkout = () => {
                   onChange={(e) => updateFormData("fullName", e.target.value)}
                   required
                 />
-              </FormGroup>
+              </FormGroup> */}
               <FormGroup>
                 <Label>Email</Label>
                 <Input
@@ -197,10 +199,8 @@ const Checkout = () => {
                 <Label>Số Điện Thoại</Label>
                 <Input
                   type="tel"
-                  value={formData.phoneNumber}
-                  onChange={(e) =>
-                    updateFormData("phoneNumber", e.target.value)
-                  }
+                  value={formData.phone}
+                  onChange={(e) => updateFormData("phone", e.target.value)}
                   required
                 />
               </FormGroup>

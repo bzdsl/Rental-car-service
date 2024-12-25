@@ -94,13 +94,14 @@ export const createBooking = async (req, res) => {
       startDate,
       endDate,
       pickupLocation,
-      pickupTime, // New field
-      notes, // New field
+      pickupTime,
+      notes,
       coupon,
       totalPrice,
+      email, // Thêm email
+      phone, // Thêm phone
     } = req.body;
 
-    // Validate input dates
     const start = new Date(startDate);
     const end = new Date(endDate);
 
@@ -110,7 +111,6 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Recheck availability (to prevent race conditions)
     const conflictingBookings = await Booking.find({
       car: carId,
       status: { $nin: ["cancelled", "completed"] },
@@ -127,14 +127,9 @@ export const createBooking = async (req, res) => {
       session.endSession();
       return res.status(409).json({
         message: "Xe đã được đặt trong khoảng thời gian này",
-        conflictingBookings: conflictingBookings.map((booking) => ({
-          startDate: booking.startDate,
-          endDate: booking.endDate,
-        })),
       });
     }
 
-    // Create new booking
     const newBooking = new Booking({
       user: req.user ? req.user._id : null,
       car: carId,
@@ -145,13 +140,13 @@ export const createBooking = async (req, res) => {
       notes,
       coupon,
       totalPrice,
+      email, // Lưu email
+      phone, // Lưu phone
       status: "pending",
     });
 
-    // Save booking with transaction
     await newBooking.save({ session });
 
-    // Commit transaction
     await session.commitTransaction();
     session.endSession();
 
@@ -160,14 +155,12 @@ export const createBooking = async (req, res) => {
       booking: newBooking,
     });
   } catch (error) {
-    // Abort transaction if error occurs
     await session.abortTransaction();
     session.endSession();
 
     console.error("Booking creation error:", error);
     res.status(500).json({
       message: "Lỗi tạo đặt xe",
-      error: error.message,
     });
   }
 };
@@ -280,9 +273,10 @@ export const getAllBookings = async (req, res) => {
 
 export const getBookingById = async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id)
-      .populate("car", "name image price")
-      .populate("user", "fullName email phone");
+    const booking = await Booking.findById(req.params.id).populate(
+      "car",
+      "name image price"
+    );
 
     if (!booking) {
       return res.status(404).json({ message: "Không tìm thấy đơn thuê" });
@@ -305,33 +299,32 @@ export const editBooking = async (req, res) => {
 
     const booking = await Booking.findById(id);
     if (!booking) {
-      return res.status(404).json({ message: "Không tìm thấy đơn thuê" });
+      return res.status(404).json({ message: "Không tìm thấy đơn đặt xe" });
     }
 
-    // Cập nhật thông tin người dùng nếu có
-    if (booking.user) {
-      await User.findByIdAndUpdate(booking.user, {
-        fullName,
-        email,
-        phone,
-      });
+    // Kiểm tra quyền truy cập: Người dùng hoặc admin
+    if (
+      req.user.role !== "admin" &&
+      (!booking.user || booking.user.toString() !== req.user._id.toString())
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Bạn không có quyền sửa đơn này" });
     }
 
-    // Cập nhật thông tin đơn thuê
-    booking.pickupLocation = pickupLocation;
-    booking.pickupTime = pickupTime;
-    booking.notes = notes;
+    // Cập nhật thông tin
+    booking.fullName = fullName || booking.fullName;
+    booking.email = email || booking.email;
+    booking.phone = phone || booking.phone;
+    booking.pickupLocation = pickupLocation || booking.pickupLocation;
+    booking.pickupTime = pickupTime || booking.pickupTime;
+    booking.notes = notes || booking.notes;
 
     await booking.save();
 
-    res.status(200).json({
-      message: "Cập nhật thông tin đơn thuê thành công",
-      booking,
-    });
+    res.status(200).json({ message: "Cập nhật thành công", booking });
   } catch (error) {
-    res.status(500).json({
-      message: "Lỗi khi cập nhật thông tin đơn thuê",
-      error: error.message,
-    });
+    console.error("Error updating booking:", error);
+    res.status(500).json({ message: "Lỗi khi cập nhật thông tin đặt xe" });
   }
 };

@@ -60,7 +60,6 @@ const RentManagement = () => {
     const statusClasses = {
       pending: "bg-warning",
       confirmed: "bg-info",
-      active: "bg-primary",
       completed: "bg-success",
       cancelled: "bg-danger",
     };
@@ -126,6 +125,14 @@ const RentManagement = () => {
                   <td>
                     <div className="d-flex gap-2">
                       <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() =>
+                          navigate(`/admin/rent-management/edit/${booking._id}`)
+                        }>
+                        Chỉnh sửa
+                      </Button>
+                      <Button
                         variant="outline-primary"
                         size="sm"
                         onClick={() => {
@@ -133,14 +140,6 @@ const RentManagement = () => {
                           setShowStatusModal(true);
                         }}>
                         Cập nhật
-                      </Button>
-                      <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={() =>
-                          navigate(`/admin/rent-management/edit/${booking._id}`)
-                        }>
-                        Chỉnh sửa
                       </Button>
                     </div>
                   </td>
@@ -164,7 +163,7 @@ const RentManagement = () => {
           </Modal.Header>
           <Modal.Body>
             <div className="d-grid gap-2">
-              {["pending", "confirmed", "active", "completed", "cancelled"].map(
+              {["pending", "confirmed", "completed", "cancelled"].map(
                 (status) => (
                   <Button
                     key={status}

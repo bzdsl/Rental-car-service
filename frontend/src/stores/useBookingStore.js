@@ -14,9 +14,9 @@ export const useBookingStore = create((set, get) => ({
   // Booking Creation State
   rentalDates: [],
   formData: {
-    fullName: "",
+    // fullName: "",
     email: "",
-    phoneNumber: "",
+    phone: "",
     pickupLocation: "",
     pickupTime: "", // New field
     notes: "", // New field
@@ -114,9 +114,9 @@ export const useBookingStore = create((set, get) => ({
     set({
       rentalDates: [],
       formData: {
-        fullName: "",
+        // fullName: "",
         email: "",
-        phoneNumber: "",
+        phone: "",
         pickupLocation: "",
         pickupTime: "",
         notes: "",
@@ -132,10 +132,9 @@ export const useBookingStore = create((set, get) => ({
 
   validateBookingData: () => {
     const { formData, rentalDates } = get();
-    const { fullName, email, phoneNumber, pickupLocation, pickupTime } =
-      formData;
+    const { email, phone, pickupLocation, pickupTime } = formData;
 
-    if (!fullName || !email || !phoneNumber || !pickupLocation || !pickupTime) {
+    if (!email || !phone || !pickupLocation || !pickupTime) {
       console.error("Vui lòng điền đầy đủ thông tin");
       return false;
     }
@@ -197,11 +196,31 @@ export const useBookingStore = create((set, get) => ({
       pickupLocation: formData.pickupLocation,
       pickupTime: formData.pickupTime,
       notes: formData.notes,
-      fullName: formData.fullName,
+      // fullName: formData.fullName,
       email: formData.email,
-      phoneNumber: formData.phoneNumber,
+      phone: formData.phone,
       totalPrice: pricing.totalPrice,
     };
+  },
+  updateBooking: async (bookingId, data) => {
+    set({ loading: true });
+    try {
+      const response = await axiosInstance.put(
+        `/bookings/${bookingId}/edit`,
+        data
+      );
+      set((state) => ({
+        bookings: state.bookings.map((b) =>
+          b._id === bookingId ? { ...b, ...data } : b
+        ),
+        successMessage: "Cập nhật thông tin thành công!",
+        error: null,
+      }));
+    } catch (err) {
+      set({ error: err.response?.data?.message || "Failed to update booking" });
+    } finally {
+      set({ loading: false });
+    }
   },
 }));
 
