@@ -222,6 +222,26 @@ export const useBookingStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+  cancelBooking: async (bookingId) => {
+    set({ loading: true });
+    try {
+      const response = await axiosInstance.put(`/bookings/${bookingId}/cancel`);
+      set((state) => ({
+        bookings: state.bookings.map((b) =>
+          b._id === bookingId ? { ...b, status: "cancelled" } : b
+        ),
+        successMessage: "Hủy đặt xe thành công!",
+        error: null,
+      }));
+    } catch (err) {
+      set({
+        error: err.response?.data?.message || "Không thể hủy đặt xe",
+        successMessage: null,
+      });
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));
 
 // Utility functions

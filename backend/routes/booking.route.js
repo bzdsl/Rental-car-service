@@ -29,6 +29,7 @@ router.get("/all-bookings", protectRoute, adminRoute, getAllBookings);
 router.put("/:bookingId/status", protectRoute, updateBookingStatus);
 
 router.get("/:id", protectRoute, getBookingById);
+
 router.put("/:id/edit", protectRoute, editBooking);
 
 // Cancel a booking (requires authentication)

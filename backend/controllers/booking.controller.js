@@ -194,19 +194,32 @@ export const cancelBooking = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy đơn thuê" });
     }
 
-    // Allow admin to cancel any booking
-    if (
-      req.user.role !== "admin" &&
-      (!booking.user || booking.user.toString() !== req.user._id.toString())
-    ) {
+    // Check if user owns this booking
+    if (!booking.user || booking.user.toString() !== req.user._id.toString()) {
       return res
         .status(403)
         .json({ message: "Bạn không có quyền hủy đơn thuê này" });
     }
 
-    // Check if booking can be cancelled (not already completed/cancelled)
-    if (["completed", "cancelled"].includes(booking.status)) {
-      return res.status(400).json({ message: "Không thể hủy đơn thuê này" });
+    // Check if booking status is pending
+    if (booking.status !== "pending") {
+      return res
+        .status(400)
+        .json({
+          message: "Chỉ có thể hủy đơn thuê đang ở trạng thái chờ xử lý",
+        });
+    }
+
+    // Check if current date is before start date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startDate = new Date(booking.startDate);
+    startDate.setHours(0, 0, 0, 0);
+
+    if (today >= startDate) {
+      return res.status(400).json({
+        message: "Không thể hủy đơn thuê vào hoặc sau ngày bắt đầu thuê xe",
+      });
     }
 
     // Update booking status
