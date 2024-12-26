@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Spinner, Alert, Button, Modal } from "react-bootstrap";
+import { Spinner, Alert, Button, Modal, Dropdown } from "react-bootstrap";
 import {
   useBookingStore,
   formatPrice,
@@ -24,12 +24,19 @@ const RentalInfo = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // Function to filter bookings based on selected status
+  const filteredBookings = bookings.filter((booking) => {
+    if (statusFilter === "all") return true;
+    return booking.status === statusFilter;
+  });
+
   const isBeforePickupTime = (startDate, pickupTime) => {
     const now = new Date();
     const bookingStart = new Date(startDate);
     bookingStart.setHours(...pickupTime.split(":").map(Number), 0, 0);
 
-    // Nếu ngày khác thì so sánh theo ngày
     if (
       now.getDate() !== bookingStart.getDate() ||
       now.getMonth() !== bookingStart.getMonth() ||
@@ -38,11 +45,10 @@ const RentalInfo = () => {
       return now < bookingStart;
     }
 
-    // Nếu cùng ngày thì kiểm tra giờ
-    // Cho phép hủy trước giờ đặt xe 2 tiếng
     const TWO_HOURS = 2 * 60 * 60 * 1000;
     return now.getTime() + TWO_HOURS < bookingStart.getTime();
   };
+
   useEffect(() => {
     fetchBookings();
   }, []);
@@ -77,6 +83,10 @@ const RentalInfo = () => {
     navigate(`/user-edit-booking/${bookingId}`);
   };
 
+  const handleStatusChange = (status) => {
+    setStatusFilter(status);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 d-flex justify-content-center align-items-center">
@@ -97,8 +107,25 @@ const RentalInfo = () => {
         {error && <Alert variant="danger">{error}</Alert>}
         {successMessage && <Alert variant="success">{successMessage}</Alert>}
 
+        <div className="mb-4">
+          <Dropdown onSelect={handleStatusChange}>
+            <Dropdown.Toggle variant="primary" id="dropdown-basic">
+              {statusFilter === "all"
+                ? "Tất cả trạng thái"
+                : `Trạng thái: ${statusFilter}`}
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              <Dropdown.Item eventKey="all">Tất cả trạng thái</Dropdown.Item>
+              <Dropdown.Item eventKey="pending">Chờ xử lý</Dropdown.Item>
+              <Dropdown.Item eventKey="confirmed">Đã xác nhận</Dropdown.Item>
+              <Dropdown.Item eventKey="cancelled">Đã hủy</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+
         <div className="space-y-6">
-          {bookings.map((booking, index) => (
+          {filteredBookings.map((booking, index) => (
             <div
               key={booking._id}
               className="d-flex align-items-center border rounded p-3 shadow-sm bg-white mb-3">
@@ -155,7 +182,7 @@ const RentalInfo = () => {
             </div>
           ))}
 
-          {bookings.length === 0 && (
+          {filteredBookings.length === 0 && (
             <div className="text-center py-4 text-muted">
               Không có lịch sử thuê xe nào
             </div>

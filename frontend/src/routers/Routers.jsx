@@ -17,7 +17,6 @@ import AdminPage from "../pages/AdminPages/AdminPage";
 import CarManagement from "../pages/AdminPages/CarManagement";
 import UserManagement from "../pages/AdminPages/UserManagement";
 import RentManagement from "../pages/AdminPages/RentManagement";
-
 import Checkout from "../pages/Checkout";
 import EditUserProfile from "../pages/AdminPages/EditUserProfile";
 import EditCar from "../pages/AdminPages/EditCar";
@@ -26,6 +25,9 @@ import UserEditBooking from "../pages/UserEditBooking";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import { useUserStore } from "../stores/useUserStore";
 import EditBooking from "../pages/AdminPages/EditBooking";
+import SearchResults from "../pages/SearchResults";
+
+// Router
 
 const Routers = () => {
   const { user } = useUserStore();
@@ -69,6 +71,8 @@ const Routers = () => {
           )
         }
       />
+      <Route path="/search-results" element={<SearchResults />} />
+
       <Route path="/payment-success" element={<PaymentSuccess />} />
       <Route path="/checkout/:slug" element={<Checkout />} />
       {/* ADMIN ROUTES */}

@@ -1,69 +1,209 @@
 /** @format */
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "../../styles/find-car-form.css";
-import { Form, FormGroup, Label, Input, Button } from "reactstrap";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import {
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Button,
+  Spinner,
+  ListGroup,
+  ListGroupItem,
+} from "reactstrap";
+import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import axiosInstance from "../../lib/axios";
+import debounce from "lodash/debounce";
 
 const FindCarForm = () => {
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    category: "",
+    brand: "",
+    priceRange: "",
+  });
+
+  // Fetch suggestions with debounce
+  const fetchSuggestions = useCallback(
+    debounce(async (query) => {
+      if (!query.trim()) {
+        setSuggestions([]);
+        return;
+      }
+
+      try {
+        const { data } = await axiosInstance.get(
+          `/search/suggestions?query=${query}`
+        );
+        setSuggestions(data.suggestions);
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+      }
+    }, 300),
+    []
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [categoriesRes, brandsRes] = await Promise.all([
+          axiosInstance.get("/categories"),
+          axiosInstance.get("/brands"),
+        ]);
+        setCategories(categoriesRes.data);
+        setBrands(brandsRes.data);
+      } catch (err) {
+        setError("Failed to load form data");
+        console.error("Error loading form data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+
+    if (id === "name") {
+      fetchSuggestions(value);
+      setShowSuggestions(true);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setFormData((prev) => ({
+      ...prev,
+      name: suggestion,
+    }));
+    setShowSuggestions(false);
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent form from submitting the traditional way
-    console.log("Form submitted with dates:", startDate, endDate);
+    e.preventDefault();
 
-    // Navigate to the CarListing component (or CarItem page) upon form submission
-    navigate("/car-listing"); // Adjust this to the correct path for CarItem or CarListing
+    let minPrice = 0;
+    let maxPrice = Number.MAX_SAFE_INTEGER;
+    if (formData.priceRange) {
+      const [min, max] = formData.priceRange.split("-").map(Number);
+      minPrice = min;
+      maxPrice = max;
+    }
+
+    const params = new URLSearchParams();
+
+    if (formData.name) params.append("name", formData.name);
+    if (formData.category) params.append("category", formData.category);
+    if (formData.brand) params.append("brand", formData.brand);
+    if (startDate) params.append("startDate", startDate.toISOString());
+    if (endDate) params.append("endDate", endDate.toISOString());
+    if (minPrice > 0) params.append("minPrice", minPrice);
+    if (maxPrice < Number.MAX_SAFE_INTEGER) params.append("maxPrice", maxPrice);
+
+    navigate({
+      pathname: "/search-results",
+      search: params.toString(),
+    });
   };
 
-  const isDateDisabled = (date) => {
-    // Disable dates before today
-    return date < new Date();
-  };
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center p-5">
+        <Spinner color="primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="alert alert-danger" role="alert">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <Form className="form" onSubmit={handleSubmit}>
       <div className="d-flex align-items-center justify-content-between flex-wrap">
-        <FormGroup className="form__group">
-          <Label for="carName">Tên xe</Label>
-          <Input id="carName" type="text" placeholder="Nhập tên phương tiện" />
+        <FormGroup className="form__group position-relative">
+          <Label for="name">Tên xe</Label>
+          <Input
+            id="name"
+            type="text"
+            placeholder="Nhập tên phương tiện"
+            value={formData.name}
+            onChange={handleInputChange}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+          />
+          {showSuggestions && suggestions.length > 0 && (
+            <ListGroup
+              className="position-absolute w-100 mt-1 shadow-sm"
+              style={{ zIndex: 1000 }}>
+              {suggestions.map((suggestion, index) => (
+                <ListGroupItem
+                  key={index}
+                  tag="button"
+                  action
+                  onClick={() => handleSuggestionClick(suggestion)}
+                  className="text-start">
+                  {suggestion}
+                </ListGroupItem>
+              ))}
+            </ListGroup>
+          )}
         </FormGroup>
 
-        {/* Loại xe */}
         <FormGroup className="select__group">
-          <Label for="carType">Mẫu xe</Label>
-          <Input id="carType" type="select">
+          <Label for="category">Mẫu xe</Label>
+          <Input
+            id="category"
+            type="select"
+            value={formData.category}
+            onChange={handleInputChange}>
             <option value="">Chọn mẫu xe</option>
-            <option value="sedan">Sedan</option>
-            <option value="suv">SUV</option>
-            <option value="mpv">MPV</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
           </Input>
         </FormGroup>
 
-        {/* Hãng xe */}
         <FormGroup className="select__group">
-          <Label for="carBrand">Hãng xe</Label>
-          <Input id="carBrand" type="select">
+          <Label for="brand">Hãng xe</Label>
+          <Input
+            id="brand"
+            type="select"
+            value={formData.brand}
+            onChange={handleInputChange}>
             <option value="">Chọn hãng xe</option>
-            <option value="toyota">Toyota</option>
-            <option value="honda">Honda</option>
-            <option value="ford">Ford</option>
-            <option value="mercedes">Mercedes-Benz</option>
-            <option value="bmw">BMW</option>
-            <option value="audi">Audi</option>
-            <option value="hyundai">Hyundai</option>
-            <option value="chevrolet">Chevrolet</option>
-            <option value="nissan">Nissan</option>
-            <option value="kia">Kia</option>
-            <option value="vinfast">VinFast</option>
+            {brands.map((brand) => (
+              <option key={brand} value={brand}>
+                {brand}
+              </option>
+            ))}
           </Input>
         </FormGroup>
 
-        {/* Ngày thuê */}
         <FormGroup className="form__group">
           <Label>Chọn ngày thuê</Label>
           <div className="d-flex gap-3">
@@ -90,10 +230,13 @@ const FindCarForm = () => {
           </div>
         </FormGroup>
 
-        {/* Khoảng giá tiền */}
         <FormGroup className="form__group">
           <Label for="priceRange">Giá tiền</Label>
-          <Input id="priceRange" type="select">
+          <Input
+            id="priceRange"
+            type="select"
+            value={formData.priceRange}
+            onChange={handleInputChange}>
             <option value="">Chọn khoảng giá</option>
             <option value="1000000-2000000">
               1.000.000 VND - 2.000.000 VND
@@ -113,7 +256,6 @@ const FindCarForm = () => {
           </Input>
         </FormGroup>
 
-        {/* Nút tìm xe */}
         <FormGroup className="form__group">
           <Label> .</Label>
           <Button className="btn find__car-btn" type="submit">

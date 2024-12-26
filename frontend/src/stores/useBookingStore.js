@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import axiosInstance from "../lib/axios";
 import { differenceInDays, startOfDay } from "date-fns";
+import toast from "react-hot-toast";
 
 export const useBookingStore = create((set, get) => ({
   // Booking History State
