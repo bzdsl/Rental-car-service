@@ -7,7 +7,7 @@ import CarItem from "../components/UI/CarItem";
 import Header from "../components/header/Header";
 import Footer from "../components/Footer/Footer";
 import { useLocation } from "react-router-dom"; // Lấy query params
-import axios from "axios";
+import axiosInstance from "../lib/axios";
 
 const SearchResults = () => {
   const location = useLocation();
@@ -21,9 +21,10 @@ const SearchResults = () => {
     const fetchSearchResults = async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get("/api/search", {
+        const { data } = await axiosInstance.get("/search", {
           params: {
             name: query.get("name") || "",
+            category: query.get("category") || "",
             brand: query.get("brand") || "",
             startDate: query.get("startDate") || null,
             endDate: query.get("endDate") || null,

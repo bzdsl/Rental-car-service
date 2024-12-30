@@ -79,6 +79,7 @@ const FindCarForm = () => {
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
+    console.log("Input changed:", id, value);
     setFormData((prev) => ({
       ...prev,
       [id]: value,
@@ -100,6 +101,7 @@ const FindCarForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("check:", formData);
 
     let minPrice = 0;
     let maxPrice = Number.MAX_SAFE_INTEGER;

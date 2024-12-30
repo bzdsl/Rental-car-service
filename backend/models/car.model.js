@@ -28,7 +28,7 @@ const carSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      required: [true, "Image is required"], // Đây sẽ là URL hoặc đường dẫn của hình ảnh
+      required: [true, "Image is required"],
     },
     isFeatured: { type: Boolean, default: false },
   },

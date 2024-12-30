@@ -5,7 +5,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/Home";
-import About from "../pages/About";
 import CarListing from "../pages/CarListing";
 import CarDetails from "../pages/CarDetails";
 import Profile from "../pages/Profile";
@@ -25,6 +24,8 @@ import UserEditBooking from "../pages/UserEditBooking";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import { useUserStore } from "../stores/useUserStore";
 import EditBooking from "../pages/AdminPages/EditBooking";
+import RevenueManagement from "../pages/AdminPages/RevenueManagement";
+
 import SearchResults from "../pages/SearchResults";
 
 // Router
@@ -37,7 +38,6 @@ const Routers = () => {
       {/* User routes */}
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={<Home />} />
-      <Route path="/about" element={<About />} />
       <Route path="/cars" element={<CarListing />} />
       <Route path="/cars/:slug" element={<CarDetails />} />
       <Route path="/checkout/:slug" element={<Checkout />} />
@@ -99,6 +99,7 @@ const Routers = () => {
         path="/admin/rent-management/:edit/:id"
         element={<EditBooking />}
       />
+      <Route path="/admin/revenue-management" element={<RevenueManagement />} />
     </Routes>
   );
 };

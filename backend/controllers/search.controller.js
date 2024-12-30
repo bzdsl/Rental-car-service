@@ -3,6 +3,7 @@ import Car from "../models/car.model.js";
 import Booking from "../models/booking.model.js";
 import Fuse from "fuse.js";
 
+// Helper function to get search suggestions
 export const searchCars = async (req, res) => {
   try {
     const {
@@ -21,7 +22,10 @@ export const searchCars = async (req, res) => {
     let carsQuery = {};
 
     // Add filters that don't need fuzzy search
-    if (category.trim()) carsQuery.category = category;
+    if (category.trim()) {
+      // Use case-insensitive regex match for category
+      carsQuery.category = new RegExp(category.trim(), "i");
+    }
     if (brand.trim()) carsQuery.brand = brand;
     if (!isNaN(minPrice) || !isNaN(maxPrice)) {
       carsQuery.price = {};
@@ -54,7 +58,8 @@ export const searchCars = async (req, res) => {
     if (name.trim()) {
       const fuseOptions = {
         keys: [
-          { name: "name", weight: 0.7 },
+          { name: "name", weight: 0.5 },
+          { name: "brand", weight: 0.2 },
           { name: "description", weight: 0.3 },
         ],
         includeScore: true,
@@ -105,7 +110,6 @@ export const searchCars = async (req, res) => {
   }
 };
 
-// Helper function to get search suggestions
 export const getSearchSuggestions = async (req, res) => {
   try {
     const { query = "" } = req.query;
@@ -130,8 +134,8 @@ export const getSearchSuggestions = async (req, res) => {
     const suggestions = [
       ...new Set(
         results.slice(0, 5).map((result) => {
-          const { name, brand, category } = result.item;
-          return `${name} ${brand} ${category}`.trim();
+          const { name, brand } = result.item;
+          return `${brand} ${name}  `.trim();
         })
       ),
     ];

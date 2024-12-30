@@ -39,7 +39,7 @@ const AdminSidebar = () => {
           </Link>
         </li>
         <li className="mt-3">
-          <Link to="/admin/analytics" className="admin-sidebar-link">
+          <Link to="/admin/revenue-management" className="admin-sidebar-link">
             Thống kê doanh thu
           </Link>
         </li>
