@@ -78,7 +78,9 @@ const EditBooking = () => {
   return (
     <AdminLayout>
       <div className="admin-section p-4">
-        <h2 className="section-title mb-4">Chỉnh sửa đơn thuê xe</h2>
+        <h1 className="text-2xl font-semibold mt-2 mb-4 text-center">
+          Chỉnh sửa thông tin thuê xe
+        </h1>
 
         {error && <Alert variant="danger">{error}</Alert>}
 

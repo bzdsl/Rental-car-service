@@ -75,7 +75,7 @@ const UserEditBooking = () => {
     <div className="min-h-screen bg-light ">
       <Header />
       <div className="container">
-        <h2 className="text-center mb-4 mt-5">Chỉnh sửa thông tin đặt xe</h2>
+        <h2 className="text-center mb-4 mt-5">Chỉnh sửa thông tin thuê xe</h2>
         {error && <Alert variant="danger">{error}</Alert>}
 
         <Form onSubmit={handleSubmit}>

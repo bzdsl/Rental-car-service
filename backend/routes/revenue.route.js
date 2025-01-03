@@ -5,17 +5,17 @@ import { adminRoute, protectRoute } from "../middleware/auth.middleware.js";
 import {
   Revenue,
   mostRevenue,
-  mostRentedCategories,
+  revenueByCategories,
 } from "../controllers/revenue.controller.js";
 
 const router = express.Router();
 
 router.get("/revenue", protectRoute, adminRoute, Revenue);
 router.get(
-  "/most-rented-categories",
+  "/revenue-by-categories",
   protectRoute,
   adminRoute,
-  mostRentedCategories
+  revenueByCategories
 );
 
 // Most rented cars API

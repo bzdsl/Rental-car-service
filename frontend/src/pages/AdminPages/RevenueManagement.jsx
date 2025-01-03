@@ -32,13 +32,17 @@ const RevenueManagement = () => {
   });
   const [data, setData] = useState({ totalRevenue: 0, revenueByType: {} });
   const [mostRented, setMostRented] = useState([]);
-  const [mostRentedCategories, setMostRentedCategories] = useState([]);
+  const [categoryRevenue, setCategoryRevenue] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchData();
   }, [filter]);
 
   const fetchData = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const revenueResponse = await axiosInstance.get("/revenues/revenue", {
         params: filter,
@@ -50,13 +54,23 @@ const RevenueManagement = () => {
       );
       setMostRented(mostRentedResponse.data);
 
-      const mostRentedCategoriesResponse = await axiosInstance.get(
-        "/revenues/most-rented-categories"
+      const categoryRevenueResponse = await axiosInstance.get(
+        "/revenues/revenue-by-categories"
       );
-      setMostRentedCategories(mostRentedCategoriesResponse.data);
+      setCategoryRevenue(categoryRevenueResponse.data);
     } catch (error) {
-      console.error("Error fetching statistics:", error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
   const chartData = {
@@ -70,17 +84,36 @@ const RevenueManagement = () => {
     ],
   };
 
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="admin-section">
+          <p>Đang tải dữ liệu...</p>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="admin-section">
+          <p>Lỗi: {error}</p>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout>
       <div className="admin-section">
         <h1 className="section-title mt-5">Thống kê doanh thu</h1>
 
-        <div
-          className="filters"
-          style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        <div className="filters flex flex-wrap gap-4 mb-4">
           <select
+            value={filter.type}
             onChange={(e) => setFilter({ ...filter, type: e.target.value })}
-            style={{ padding: "5px", borderRadius: "5px" }}>
+            className="p-2 border rounded-md">
             <option value="day">Theo ngày</option>
             <option value="month">Theo tháng</option>
             <option value="year">Theo năm</option>
@@ -88,67 +121,89 @@ const RevenueManagement = () => {
 
           <input
             type="date"
+            value={filter.startDate}
             onChange={(e) =>
               setFilter({ ...filter, startDate: e.target.value })
             }
-            placeholder="Ngày bắt đầu"
-            style={{ padding: "5px", borderRadius: "5px" }}
+            className="p-2 border rounded-md"
           />
           <input
             type="date"
+            value={filter.endDate}
             onChange={(e) => setFilter({ ...filter, endDate: e.target.value })}
-            placeholder="Ngày kết thúc"
-            style={{ padding: "5px", borderRadius: "5px" }}
+            className="p-2 border rounded-md"
           />
         </div>
 
         <div
-          className="chart-container"
-          style={{ maxWidth: "800px", margin: "0 " }}>
+          className="chart-container mx-auto mb-6"
+          style={{ maxWidth: "100%" }}>
           <Bar data={chartData} />
         </div>
 
-        <h2>Các mẫu xe được yêu chuộng nhất</h2>
-        <table className="table admin-table">
-          <thead>
-            <tr>
-              <th>STT</th>
-              <th>Tên xe</th>
-              <th>Số lần thuê</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mostRented.map((car, index) => (
-              <tr key={car._id}>
-                <td>{index + 1}</td>
-                <td>
-                  {car.carDetails.brand} {car.carDetails.name}
-                </td>
-                <td>{car.count}</td>
+        {/* <h2 className="text-lg font-bold mb-4">Thống kê theo loại xe</h2>
+        <div className="table-responsive overflow-x-auto">
+          <table className="table admin-table w-full border-collapse">
+            <thead>
+              <tr>
+                <th className="border p-2">STT</th>
+                <th className="border p-2">Loại xe</th>
+                <th className="border p-2">Số lần thuê</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {categoryRevenue.length > 0 ? (
+                categoryRevenue.map((category, index) => (
+                  <tr key={category._id}>
+                    <td className="border p-2">{index + 1}</td>
+                    <td className="border p-2">{category.name}</td>
+                    <td className="border p-2">{category.count}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="text-center border p-2">
+                    Không có dữ liệu
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div> */}
 
-        <h2>Các loại xe được thuê nhiều nhất</h2>
-        <table className="table admin-table">
-          <thead>
-            <tr>
-              <th>STT</th>
-              <th>Loại xe</th>
-              <th>Số lần thuê</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mostRentedCategories.map((category, index) => (
-              <tr key={category._id}>
-                <td>{index + 1}</td>
-                <td>{category.name}</td>
-                <td>{category.count}</td>
+        <h2 className="text-lg font-bold mb-4">
+          Các mẫu xe được yêu chuộng nhất
+        </h2>
+        <div className="table-responsive overflow-x-auto">
+          <table className="table admin-table w-full border-collapse">
+            <thead>
+              <tr>
+                <th className="border p-2">STT</th>
+                <th className="border p-2">Tên xe</th>
+                <th className="border p-2">Số lần thuê</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {mostRented.length > 0 ? (
+                mostRented.map((car, index) => (
+                  <tr key={car._id}>
+                    <td className="border p-2">{index + 1}</td>
+                    <td className="border p-2">
+                      {car.carDetails.brand} {car.carDetails.name}
+                    </td>
+                    <td className="border p-2">{car.count}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="text-center border p-2">
+                    Không có dữ liệu
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </AdminLayout>
   );

@@ -175,7 +175,7 @@ const Checkout = () => {
       <Container className="mt-5">
         <Row>
           <Col lg="8">
-            <h2 className="mb-4">Thanh Toán Thuê Xe</h2>
+            <h2 className="mb-4">Thông tin thuê xe</h2>
             <Form onSubmit={handleSubmit}>
               {/* <FormGroup>
                 <Label>Họ và Tên</Label>

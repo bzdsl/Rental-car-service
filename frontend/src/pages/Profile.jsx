@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Form, FormGroup, Label, Input, Button } from "reactstrap";
 import { useUserStore } from "../stores/useUserStore"; // import đúng store
-import axios from "axios";
+import axiosInstance from "../lib/axios";
 import Header from "../components/header/Header";
 import Footer from "../components/Footer/Footer";
 
@@ -40,7 +40,7 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.put("/api/auth/profile", formData, {
+      const res = await axiosInstance.put("/auth/profile", formData, {
         withCredentials: true,
       });
 
@@ -75,7 +75,7 @@ const Profile = () => {
     <>
       <Header />
       <Container className="mt-5">
-        <h2 className="mb-4 text-primary">Thông tin cá nhân</h2>
+        <h2 className="mb-4">Thông tin cá nhân</h2>
         <Form
           onSubmit={handleSubmit}
           className="p-3 border rounded shadow-sm bg-light mb-5">
@@ -149,7 +149,7 @@ const Profile = () => {
           </FormGroup>
 
           <div className="mb-2">
-            <Button type="submit" color="primary" className="px-4">
+            <Button type="submit" color="danger" className="px-4">
               Cập nhật
             </Button>
           </div>

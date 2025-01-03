@@ -80,10 +80,16 @@ export const mostRevenue = async (req, res) => {
   }
 };
 
-export const mostRentedCategories = async (req, res) => {
+export const revenueByCategories = async (req, res) => {
   try {
     const categories = await Booking.aggregate([
-      { $match: { status: "completed" } },
+      // Lọc các booking đã hoàn thành
+      {
+        $match: {
+          status: "completed",
+        },
+      },
+      // Lookup để lấy thông tin xe
       {
         $lookup: {
           from: "cars",
@@ -93,35 +99,34 @@ export const mostRentedCategories = async (req, res) => {
         },
       },
       { $unwind: "$carDetails" },
-      {
-        $group: {
-          _id: "$carDetails.category",
-          count: { $sum: 1 },
-        },
-      },
+      // Lookup để lấy thông tin category
       {
         $lookup: {
           from: "categories",
-          localField: "_id",
+          localField: "carDetails.category",
           foreignField: "_id",
           as: "categoryDetails",
         },
       },
       { $unwind: "$categoryDetails" },
+      // Group theo category để đếm số lần thuê
       {
-        $project: {
-          name: "$categoryDetails.name",
-          count: 1,
+        $group: {
+          _id: "$categoryDetails._id",
+          name: { $first: "$categoryDetails.name" },
+          count: { $sum: 1 },
         },
       },
+      // Sắp xếp theo số lần thuê nhiều nhất
       { $sort: { count: -1 } },
     ]);
 
     res.status(200).json(categories);
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ message: "Error fetching most rented categories", error });
+    console.error("Error in revenueByCategories:", error);
+    res.status(500).json({
+      message: "Error fetching category statistics",
+      error: error.message,
+    });
   }
 };

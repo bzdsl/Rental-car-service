@@ -46,7 +46,7 @@ const EditUserProfile = () => {
     <AdminLayout>
       <div className="admin-section">
         <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold mb-4 text-center mt-3">
+          <h1 className="text-2xl font-semibold mt-2 mb-4 text-center">
             Chỉnh sửa thông tin người dùng
           </h1>
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}

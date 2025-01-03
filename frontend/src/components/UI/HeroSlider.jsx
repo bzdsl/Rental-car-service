@@ -9,19 +9,25 @@ import "../../styles/hero-slider.css";
 const slideData = [
   {
     title: "Thuê xe ngay",
-    heading: "ilorem ipsum dolor sit amet consectetur.",
+    heading: "Với chương trình khuyến mãi đầu năm",
+    subHeading:
+      "Nhập mã FIRST10 để được giảm ngay 10% tổng giá trị hóa đơn khi thanh toán",
     buttonText: "Thuê xe",
     link: "/cars",
   },
   {
     title: "Thuê xe ngay",
-    heading: "ilorem ipsum dolor sit amet consectetur.",
+    heading: "Với chương trình khuyến mãi đầu năm",
+    subHeading:
+      "Nhập mã FIRST10 để được giảm ngay 10% tổng giá trị hóa đơn khi thanh toán",
     buttonText: "Thuê xe",
     link: "/cars",
   },
   {
     title: "Thuê xe ngay",
-    heading: "ilorem ipsum dolor sit amet consectetur.",
+    heading: "Với chương trình khuyến mãi đầu năm",
+    subHeading:
+      "Nhập mã FIRST10 để được giảm ngay 10% tổng giá trị hóa đơn khi thanh toán",
     buttonText: "Thuê xe",
     link: "/cars",
   },
@@ -48,8 +54,9 @@ const HeroSlider = () => {
           className={`slider__item slider__item-0${index + 1} mt0`}>
           <Container>
             <div className="slider__content">
-              <h4 className="text-light  mb-1">{slide.title}</h4>
+              <h4 className="text-light mb-1">{slide.title}</h4>
               <h1 className="text-light mb-2">{slide.heading}</h1>
+              <p className="text-light subheading mb-4">{slide.subHeading}</p>
               <button className="btn reserve__btn mt-6 w-32">
                 <Link to={slide.link}>{slide.buttonText}</Link>
               </button>

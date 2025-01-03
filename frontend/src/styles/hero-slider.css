@@ -74,6 +74,18 @@
     font-size: 2rem;
   }
 }
+.slider__content .subheading {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #ffffff;
+  opacity: 0.8;
+}
+
+@media only screen and (max-width: 992px) {
+  .slider__content .subheading {
+    font-size: 1rem;
+  }
+}
 
 @media only screen and (max-width: 768px) {
   .slider__item {
@@ -82,5 +94,8 @@
 
   .slider__content h1 {
     font-size: 1.5rem;
+  }
+  .slider__content .subheading {
+    font-size: 0.9rem;
   }
 }

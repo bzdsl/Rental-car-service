@@ -61,8 +61,8 @@ const EditCar = () => {
   return (
     <AdminLayout>
       <div className="container mx-auto p-6 bg-white shadow-lg rounded-lg">
-        <h1 className="text-2xl font-semibold mb-4 text-center">
-          Chỉnh sửa phương tiện
+        <h1 className="text-2xl font-semibold mt-2 mb-4 text-center">
+          Chỉnh sửa thông tin phương tiện
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="form-group">
@@ -146,7 +146,7 @@ const EditCar = () => {
           </div>
           <button
             type="submit"
-            className={`btn btn-success w-full mt-3 ${
+            className={`btn btn-success w-full mt-3 mb-3 ${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={loading}>
