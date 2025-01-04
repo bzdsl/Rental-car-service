@@ -7,9 +7,12 @@ import {
   updateUser,
   getUserById,
   deleteUser,
+  userCount,
 } from "../controllers/user.controller.js";
 
 const router = express.Router();
+
+router.get("/count", protectRoute, adminRoute, userCount);
 
 // User management routes
 router.get("/users-management", protectRoute, adminRoute, getUsers);

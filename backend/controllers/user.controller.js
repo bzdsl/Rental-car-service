@@ -67,7 +67,6 @@ export const changePassword = async (req, res) => {
   }
 };
 
-// Get Profile (existing)
 export const getProfile = async (req, res) => {
   try {
     res.json(req.user);
@@ -147,5 +146,14 @@ export const deleteUser = async (req, res) => {
   } catch (error) {
     console.error("Error deleting user:", error);
     res.status(500).json({ message: "Failed to delete user" });
+  }
+};
+
+export const userCount = async (req, res) => {
+  try {
+    const count = await User.countDocuments({ role: "user" }); // Filter for role "user"
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

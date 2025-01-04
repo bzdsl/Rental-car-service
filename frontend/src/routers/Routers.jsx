@@ -25,6 +25,8 @@ import PaymentSuccess from "../pages/PaymentSuccess";
 import { useUserStore } from "../stores/useUserStore";
 import EditBooking from "../pages/AdminPages/EditBooking";
 import RevenueManagement from "../pages/AdminPages/RevenueManagement";
+import CouponsManagement from "../pages/AdminPages/CouponsManagement";
+import CouponForm from "../components/UI/Admin/CouponForm";
 
 import SearchResults from "../pages/SearchResults";
 
@@ -100,6 +102,12 @@ const Routers = () => {
         element={<EditBooking />}
       />
       <Route path="/admin/revenue-management" element={<RevenueManagement />} />
+      <Route path="/admin/coupon-management" element={<CouponsManagement />} />
+      <Route path="/admin/coupon-management/create" element={<CouponForm />} />
+      <Route
+        path="/admin/coupon-management/edit/:id"
+        element={<CouponForm />}
+      />
     </Routes>
   );
 };

@@ -11,6 +11,7 @@ import {
   getCarsByCategory,
   toggleFeaturedCar,
   updateCar,
+  carCount,
 } from "../controllers/car.controller.js";
 
 const router = express.Router();
@@ -23,5 +24,5 @@ router.post("/", protectRoute, adminRoute, createCar);
 router.patch("/:id", protectRoute, adminRoute, updateCar);
 router.patch("/:id", protectRoute, adminRoute, toggleFeaturedCar);
 router.delete("/:id", protectRoute, adminRoute, deleteCar);
-// router.get("/cars/count", protectRoute, adminRoute, carCount);
+router.get("/count", protectRoute, adminRoute, carCount);
 export default router;
