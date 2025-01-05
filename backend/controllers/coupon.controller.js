@@ -21,39 +21,43 @@ export const validateCoupon = async (req, res) => {
 
     const coupon = await Coupon.findOne({
       code: code,
-      userId: req.user._id,
       isActive: true,
     });
 
     if (!coupon) {
-      return res.status(404).json({ message: "Coupon not found" });
+      return res.status(404).json({ message: "Mã khuyến mãi không tồn tại" });
     }
 
-    // Check if the coupon is expired
-    if (coupon.expirationDate < new Date()) {
+    // Kiểm tra mã giảm giá có hết hạn không
+    if (coupon.validUntil < new Date()) {
       coupon.isActive = false;
       await coupon.save();
-      return res.status(400).json({ message: "Coupon expired" });
+      return res.status(400).json({ message: "Mã khuyến mãi đã hết hạn" });
     }
 
-    // If coupon is valid
+    // Nếu mã giảm giá hợp lệ, đảm bảo trả về đúng format
     return res.json({
-      message: "Coupon is valid",
+      validUntil: true, // Thêm trường valid
+      message: "Mã khuyến mãi hợp lệ",
       code: coupon.code,
-      discountPercentage: coupon.discountPercentage,
+      discount: coupon.discount,
+      type: "percent", // Thêm type để frontend biết cách tính
     });
   } catch (error) {
     console.error("Error in validateCoupon controller:", error.message);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
+
 // In coupon.controller.js
 export const createCoupon = async (req, res) => {
   try {
+    console.log("Request body:", req.body); // Log dữ liệu nhận từ client
     const coupon = new Coupon(req.body);
     await coupon.save();
     res.status(201).json(coupon);
   } catch (error) {
+    console.error("Error in createCoupon:", error.message);
     res
       .status(500)
       .json({ message: "Error creating coupon", error: error.message });

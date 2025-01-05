@@ -3,7 +3,6 @@
 // bookingController.js
 import Booking from "../models/booking.model.js";
 import Car from "../models/car.model.js";
-import User from "../models/user.model.js";
 import mongoose from "mongoose";
 
 export const checkBookingAvailability = async (req, res) => {
@@ -203,11 +202,9 @@ export const cancelBooking = async (req, res) => {
 
     // Check if booking status is pending
     if (booking.status !== "pending") {
-      return res
-        .status(400)
-        .json({
-          message: "Chỉ có thể hủy đơn thuê đang ở trạng thái chờ xử lý",
-        });
+      return res.status(400).json({
+        message: "Chỉ có thể hủy đơn thuê đang ở trạng thái chờ xử lý",
+      });
     }
 
     // Check if current date is before start date

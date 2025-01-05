@@ -6,21 +6,17 @@ import { differenceInDays, startOfDay } from "date-fns";
 import toast from "react-hot-toast";
 
 export const useBookingStore = create((set, get) => ({
-  // Booking History State
   bookings: [],
   error: null,
   successMessage: "",
   loading: false,
-
-  // Booking Creation State
   rentalDates: [],
   formData: {
-    // fullName: "",
     email: "",
     phone: "",
     pickupLocation: "",
-    pickupTime: "", // New field
-    notes: "", // New field
+    pickupTime: "",
+    notes: "",
     discountCode: "",
   },
   pricing: {
@@ -148,15 +144,33 @@ export const useBookingStore = create((set, get) => ({
     return true;
   },
 
-  applyDiscountCode: (discountCode) => {
-    const { DISCOUNT_CODES, pricing, calculatePricing } = get();
-    const isValidCode = Object.keys(DISCOUNT_CODES).includes(discountCode);
+  applyDiscountCode: async (discountCode) => {
+    try {
+      const response = await axiosInstance.post("/coupons/validate", {
+        code: discountCode,
+      });
 
-    if (isValidCode) {
-      calculatePricing(pricing.basePrice, discountCode, pricing.rentalDays);
-      return true;
-    } else {
-      calculatePricing(pricing.basePrice, "", pricing.rentalDays);
+      if (response.data.discount) {
+        const { pricing } = get();
+        // Tính toán giảm giá theo phần trăm từ model
+        const discountAmount =
+          (response.data.discount / 100) * pricing.basePrice;
+
+        set({
+          pricing: {
+            ...pricing,
+            discountAmount,
+            totalPrice: pricing.basePrice - discountAmount,
+          },
+        });
+        return true;
+      } else {
+        set({ error: "Mã giảm giá không hợp lệ hoặc đã hết hạn" });
+        return false;
+      }
+    } catch (error) {
+      console.error("Error applying discount code:", error);
+      set({ error: "Có lỗi khi áp dụng mã giảm giá" });
       return false;
     }
   },

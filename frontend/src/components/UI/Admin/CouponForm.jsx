@@ -25,7 +25,7 @@ const CouponForm = () => {
 
   const fetchCouponDetails = async () => {
     try {
-      const response = await axiosInstance.get(`/coupons/${id}`);
+      const response = await axiosInstance.get(`/coupons/details/${id}`); // Get details of a coupon
       const coupon = response.data;
       setFormData({
         code: coupon.code,
@@ -46,10 +46,10 @@ const CouponForm = () => {
 
     try {
       if (id) {
-        await axiosInstance.put(`/coupons/${id}`, formData);
+        await axiosInstance.put(`/coupons/update/${id}`, formData); // Update a coupon
         toast.success("Cập nhật mã giảm giá thành công!");
       } else {
-        await axiosInstance.post("/coupons", formData);
+        await axiosInstance.post("/coupons/create", formData); // Create a new coupon
         toast.success("Tạo mã giảm giá thành công!");
       }
       navigate("/admin/coupon-management");

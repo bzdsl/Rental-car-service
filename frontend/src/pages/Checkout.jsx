@@ -25,12 +25,12 @@ const Checkout = () => {
     calculateInitialPricing,
     applyDiscountCode,
     prepareBookingData,
-    resetBooking,
   } = useBookingStore();
 
   const [discountCode, setDiscountCode] = useState("");
   const [discountError, setDiscountError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
 
   useEffect(() => {
     const car = cars.find((item) => item._id === slug);
@@ -51,25 +51,39 @@ const Checkout = () => {
     calculateInitialPricing,
   ]);
 
-  // Check authentication status
   useEffect(() => {
     if (!checkingAuth && !user) {
-      // message.error("Vui lòng đăng nhập để tiếp tục thanh toán");
       navigate("/login", { state: { from: `/checkout/${slug}` } });
     }
   }, [user, checkingAuth, navigate, slug]);
 
-  const handleDiscountCode = () => {
-    const success = applyDiscountCode(discountCode);
-    if (success) {
-      setDiscountError("");
-      message.success("Mã giảm giá đã được áp dụng!");
-    } else {
-      setDiscountError("Mã giảm giá không hợp lệ");
-      message.error("Mã giảm giá không tồn tại");
+  const handleDiscountCode = async () => {
+    if (!discountCode) {
+      setDiscountError("Vui lòng nhập mã giảm giá");
+      return;
+    }
+
+    setIsApplyingDiscount(true);
+    setDiscountError("");
+
+    try {
+      const success = await applyDiscountCode(discountCode);
+
+      if (success) {
+        message.success("Mã giảm giá đã được áp dụng thành công!");
+        updateFormData("discountCode", discountCode);
+      } else {
+        setDiscountError("Mã giảm giá không hợp lệ hoặc đã hết hạn");
+      }
+    } catch (error) {
+      console.error("Error in handleDiscountCode:", error);
+      setDiscountError(
+        error.response?.data?.message || "Có lỗi xảy ra khi áp dụng mã giảm giá"
+      );
+    } finally {
+      setIsApplyingDiscount(false);
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isProcessing) return;
@@ -177,15 +191,6 @@ const Checkout = () => {
           <Col lg="8">
             <h2 className="mb-4">Thông tin thuê xe</h2>
             <Form onSubmit={handleSubmit}>
-              {/* <FormGroup>
-                <Label>Họ và Tên</Label>
-                <Input
-                  type="text"
-                  value={formData.fullName}
-                  onChange={(e) => updateFormData("fullName", e.target.value)}
-                  required
-                />
-              </FormGroup> */}
               <FormGroup>
                 <Label>Email</Label>
                 <Input
@@ -246,12 +251,14 @@ const Checkout = () => {
                     }}
                     placeholder="Nhập mã giảm giá"
                     className="mr-2"
+                    disabled={isApplyingDiscount}
                   />
                   <button
                     type="button"
                     className="btn btn-outline-secondary"
-                    onClick={handleDiscountCode}>
-                    Áp Dụng
+                    onClick={handleDiscountCode}
+                    disabled={isApplyingDiscount}>
+                    {isApplyingDiscount ? "Đang áp dụng..." : "Áp Dụng"}
                   </button>
                 </div>
                 {discountError && (

@@ -3,7 +3,6 @@
 import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import {
-  getCoupon,
   validateCoupon,
   getAllCoupons,
   createCoupon,
@@ -11,14 +10,15 @@ import {
   updateCoupon,
   deleteCoupon,
 } from "../controllers/coupon.controller.js";
-// import { validateCoupon } from "../controllers/coupon.controller.js";
+
 const router = express.Router();
 
-router.get("/", protectRoute, getCoupon);
-router.get("/validate", protectRoute, validateCoupon);
-router.get("/coupons", protectRoute, getAllCoupons);
-router.post("/", protectRoute, createCoupon);
-router.get("/:id", protectRoute, getCouponById);
-router.put("/:id", protectRoute, updateCoupon);
-router.delete("/coupons/:id", protectRoute, deleteCoupon);
+// Routes cho mã giảm giá
+router.post("/validate", protectRoute, validateCoupon);
+router.get("/list", protectRoute, getAllCoupons);
+router.post("/create", protectRoute, createCoupon);
+router.get("/details/:id", protectRoute, getCouponById);
+router.put("/update/:id", protectRoute, updateCoupon);
+router.delete("/delete/:id", protectRoute, deleteCoupon);
+
 export default router;

@@ -9,24 +9,33 @@ import { toast } from "react-hot-toast";
 const CouponsManagement = () => {
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const fetchCoupons = async () => {
     try {
-      const response = await axiosInstance.get("/coupons");
-      setCoupons(
-        Array.isArray(response.data) ? response.data : [response.data]
-      );
-      setLoading(false);
+      const response = await axiosInstance.get("/coupons/list"); // Get all coupons
+      const validCoupons = Array.isArray(response.data)
+        ? response.data.filter((coupon) => coupon && coupon._id && coupon.code)
+        : [];
+      setCoupons(validCoupons);
+      setError(null);
     } catch (err) {
       console.error("Error fetching coupons:", err);
-      toast.error("Không thể tải danh sách mã giảm giá!");
+      setError("Không thể tải danh sách mã giảm giá!");
       setCoupons([]);
+      toast.error("Không thể tải danh sách mã giảm giá!");
+    } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (couponId) => {
+    if (!couponId) {
+      toast.error("Mã giảm giá không hợp lệ!");
+      return;
+    }
+
     const confirmDelete = window.confirm(
       "Bạn có chắc chắn muốn xóa mã giảm giá này không?"
     );
@@ -34,9 +43,9 @@ const CouponsManagement = () => {
     if (!confirmDelete) return;
 
     try {
-      await axiosInstance.delete(`/coupons/${couponId}`);
+      await axiosInstance.delete(`/coupons/delete/${couponId}`); // Delete a coupon
       toast.success("Mã giảm giá đã được xóa thành công!");
-      fetchCoupons();
+      fetchCoupons(); // Refresh the list
     } catch (err) {
       console.error("Error deleting coupon:", err);
       toast.error("Xóa mã giảm giá không thành công!");
@@ -53,6 +62,20 @@ const CouponsManagement = () => {
         <div className="admin-section">
           <h1 className="section-title mt-5">Quản lý mã giảm giá</h1>
           <p>Đang tải...</p>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="admin-section">
+          <h1 className="section-title mt-5">Quản lý mã giảm giá</h1>
+          <p className="text-danger">{error}</p>
+          <button className="btn btn-primary" onClick={fetchCoupons}>
+            Thử lại
+          </button>
         </div>
       </AdminLayout>
     );
@@ -80,44 +103,59 @@ const CouponsManagement = () => {
                 <th>Mã giảm giá</th>
                 <th>Phần trăm giảm</th>
                 <th>Ngày hết hạn</th>
+                <th>Ngày tạo</th>
                 <th>Trạng thái</th>
                 <th>Hành động</th>
               </tr>
             </thead>
             <tbody>
-              {coupons.map((coupon, index) => (
-                <tr key={coupon._id}>
-                  <td>{index + 1}</td>
-                  <td>{coupon.code}</td>
-                  <td>{coupon.discount}%</td>
-                  <td>
-                    {new Date(coupon.validUntil).toLocaleDateString("vi-VN")}
-                  </td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        coupon.isActive ? "bg-success" : "bg-danger"
-                      }`}>
-                      {coupon.isActive ? "Còn hiệu lực" : "Hết hiệu lực"}
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-warning"
-                      onClick={() =>
-                        navigate(`/admin/coupon-management/edit/${coupon._id}`)
-                      }>
-                      Chỉnh sửa
-                    </button>
-                    <button
-                      style={{ marginLeft: "10px" }}
-                      className="btn btn-danger"
-                      onClick={() => handleDelete(coupon._id)}>
-                      Xóa
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {coupons.map((coupon, index) => {
+                // Skip rendering if coupon is invalid
+                if (!coupon || !coupon._id || !coupon.code) {
+                  return null;
+                }
+
+                return (
+                  <tr key={coupon._id}>
+                    <td>{index + 1}</td>
+                    <td>{coupon.code}</td>
+                    <td>{coupon.discount}%</td>
+                    <td>
+                      {new Date(coupon.validUntil).toLocaleDateString("vi-VN")}
+                    </td>
+                    <td>
+                      {coupon.createAt
+                        ? new Date(coupon.createAt).toLocaleDateString("vi-VN")
+                        : "N/A"}
+                    </td>
+                    <td>
+                      <span
+                        className={`badge ${
+                          coupon.isActive ? "bg-success" : "bg-danger"
+                        }`}>
+                        {coupon.isActive ? "Còn hiệu lực" : "Hết hiệu lực"}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-warning"
+                        onClick={() =>
+                          navigate(
+                            `/admin/coupon-management/edit/${coupon._id}`
+                          )
+                        }>
+                        Chỉnh sửa
+                      </button>
+                      <button
+                        style={{ marginLeft: "10px" }}
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(coupon._id)}>
+                        Xóa
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
