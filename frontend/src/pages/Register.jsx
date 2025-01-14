@@ -31,15 +31,21 @@ const Register = () => {
     setErrorMessage("");
 
     try {
-      await register({ name, email, phone, password, confirmPassword });
-      navigate("/login");
-    } catch (error) {
-      // Handle errors (if any)
-      if (error.response && error.response.status === 400) {
-        setErrorMessage("Email này đã tồn tại"); // Account already exists
-      } else {
-        setErrorMessage("Đã có lỗi xảy ra, vui lòng thử lại."); // Generic error message
+      const success = await register({
+        name,
+        email,
+        phone,
+        password,
+        confirmPassword,
+      });
+      if (success) {
+        // Chỉ chuyển đến trang login nếu đăng ký thành công
+        navigate("/login");
       }
+    } catch (error) {
+      setErrorMessage(
+        error.response?.data?.message || "Đã có lỗi xảy ra, vui lòng thử lại."
+      );
     }
   };
 

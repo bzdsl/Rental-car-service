@@ -8,23 +8,23 @@ import "../../styles/footer.css";
 
 const quickLinks = [
   {
-    path: "/about",
-    display: "About",
+    path: "#",
+    display: "Thông tin về chúng tôi",
   },
 
   {
     path: "#",
-    display: "Privacy Policy",
+    display: "Chính sách",
   },
 
   {
     path: "/cars",
-    display: "Car Listing",
+    display: "Phương tiện",
   },
 
   {
     path: "/contact",
-    display: "Contact",
+    display: "Liên hệ",
   },
 ];
 
@@ -56,7 +56,7 @@ const Footer = () => {
 
           <Col lg="2" md="4" sm="6">
             <div className="mb-4">
-              <h5 className="footer__link-title">Quick Links</h5>
+              <h5 className="footer__link-title">Dịch vụ</h5>
               <ListGroup>
                 {quickLinks.map((item, index) => (
                   <ListGroupItem key={index} className="p-0 mt-3 quick__link">
@@ -69,20 +69,20 @@ const Footer = () => {
 
           <Col lg="3" md="4" sm="6">
             <div className="mb-4">
-              <h5 className="footer__link-title mb-4">Head Office</h5>
+              <h5 className="footer__link-title mb-4">Thông tin</h5>
               <p className="office__info">Hà Nội</p>
               <p className="office__info">Phone: +84 12345678</p>
 
               <p className="office__info">Email: bzdsl.producer@gmail.com</p>
 
-              <p className="office__info">Office Time: 9am - 7pm</p>
+              <p className="office__info">Thời gian làm việc: 9am - 7pm</p>
             </div>
           </Col>
 
           <Col lg="3" md="4" sm="12">
             <div className="mb-4">
               <h5 className="footer__link-title">Newsletter</h5>
-              <p className="section__description">Subscribe our newsletter</p>
+              <p className="section__description">Đăng ký để nhận thông báo</p>
               <div className="newsletter">
                 <input type="email" placeholder="Email" />
                 <span>

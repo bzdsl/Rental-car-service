@@ -5,6 +5,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/Home";
+import Contact from "../pages/Contact";
 import CarListing from "../pages/CarListing";
 import CarDetails from "../pages/CarDetails";
 import Profile from "../pages/Profile";
@@ -41,6 +42,7 @@ const Routers = () => {
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={<Home />} />
       <Route path="/cars" element={<CarListing />} />
+      <Route path="/contact" element={<Contact />} />
       <Route path="/cars/:slug" element={<CarDetails />} />
       <Route path="/checkout/:slug" element={<Checkout />} />
       <Route path="/category/:category" element={<CategoryPage />} />

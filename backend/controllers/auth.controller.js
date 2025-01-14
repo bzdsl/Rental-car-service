@@ -49,7 +49,7 @@ export const register = async (req, res) => {
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      return res.status(400).json({ message: "Tài khoản đã tồn tại" });
+      return res.status(400).json({ message: "Email này đã tồn tại" });
     }
 
     // Tạo người dùng mới
@@ -64,8 +64,10 @@ export const register = async (req, res) => {
     // Thiết lập cookies
     setCookies(res, accessToken, refreshToken);
 
-    // Phản hồi
+    // Phản hồi thành công
     res.status(201).json({
+      success: true,
+      message: "Đăng ký tài khoản thành công",
       user: {
         _id: user._id,
         name: user.name,
@@ -75,7 +77,7 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -129,7 +131,7 @@ export const logout = async (req, res) => {
   }
 };
 
-// Làm mới token (refresh token)
+// refresh token
 export const refreshToken = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;

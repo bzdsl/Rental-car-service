@@ -29,12 +29,12 @@ const AdminSidebar = () => {
           </Link>
         </li>
         <li className="mt-3">
-          <Link to="/admin/" className="admin-sidebar-link">
+          <Link to="#" className="admin-sidebar-link">
             Quản lý phản hồi
           </Link>
         </li>
         <li className="mt-3">
-          <Link to="/admin/" className="admin-sidebar-link">
+          <Link to="#" className="admin-sidebar-link">
             Quản lý thanh toán
           </Link>
         </li>

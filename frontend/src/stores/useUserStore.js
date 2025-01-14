@@ -13,34 +13,35 @@ export const useUserStore = create((set, get) => ({
   register: async ({ name, email, phone, password, confirmPassword }) => {
     set({ loading: true });
 
-    // Check if passwords match
-    if (password !== confirmPassword) {
-      set({ loading: false });
-      return toast.error("Mật khẩu không chính xác");
-    }
-
     try {
+      // Check if passwords match
+      if (password !== confirmPassword) {
+        set({ loading: false });
+        toast.error("Mật khẩu xác nhận không khớp");
+        return false;
+      }
+
       const res = await axios.post("/auth/register", {
         name,
         email,
         phone,
         password,
       });
-      set({ user: null, loading: false }); // Do not log in automatically
-      toast.success("Đăng ký thành công", {
-        dangerouslyAllowHtml: true,
-      });
+
+      set({ loading: false });
+      toast.success("Đăng ký tài khoản thành công");
+      return true; // Trả về true để biết đăng ký thành công
     } catch (error) {
       set({ loading: false });
       toast.error(
-        error.response.data.message || "An error occurred during registration"
+        error.response?.data?.message || "Đã có lỗi xảy ra khi đăng ký"
       );
+      return false; // Trả về false nếu đăng ký thất bại
     }
   },
 
   login: async (email, password) => {
     set({ loading: true });
-
     try {
       const res = await axios.post("/auth/login", { email, password });
       set({ user: res.data, loading: false });
@@ -49,7 +50,9 @@ export const useUserStore = create((set, get) => ({
       });
     } catch (error) {
       set({ loading: false });
-      toast.error(error.response.data.message || "An error occurred");
+      toast.error(
+        error.response?.data?.message || "Đã có lỗi xảy ra khi đăng nhập"
+      );
     }
   },
 
@@ -115,6 +118,12 @@ axios.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // Skip refresh token for login route
+    if (originalRequest.url === "/auth/login") {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 

@@ -63,7 +63,7 @@ export const searchCars = async (req, res) => {
           { name: "description", weight: 0.3 },
         ],
         includeScore: true,
-        threshold: 0.4,
+        threshold: 0.6,
         minMatchCharLength: 2,
       };
 
