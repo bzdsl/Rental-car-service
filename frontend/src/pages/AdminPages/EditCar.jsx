@@ -137,11 +137,20 @@ const EditCar = () => {
               className="form-control"
             />
             {carDetails.image && (
-              <img
-                src={carDetails.image}
-                alt="Preview"
-                className="mt-4 w-32 h-32 object-cover"
-              />
+              <div className="mt-4 w-full max-w-lg mx-auto">
+                <img
+                  src={carDetails.image}
+                  alt="Preview"
+                  style={{
+                    maxWidth: "100%",
+                    height: "auto",
+                    objectFit: "contain",
+                    border: "1px solid #ccc",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+              </div>
             )}
           </div>
           <button
