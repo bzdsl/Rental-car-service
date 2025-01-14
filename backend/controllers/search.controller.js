@@ -56,11 +56,15 @@ export const searchCars = async (req, res) => {
 
     // Apply Fuse.js search if name is provided
     if (name.trim()) {
+      const [brandPart, ...nameParts] = name.split(" ");
+      const searchBrand = brandPart.trim();
+      const searchName = nameParts.join(" ").trim();
+
       const fuseOptions = {
         keys: [
           { name: "name", weight: 0.5 },
-          { name: "brand", weight: 0.2 },
-          { name: "description", weight: 0.3 },
+          { name: "brand", weight: 0.3 },
+          { name: "description", weight: 0.2 },
         ],
         includeScore: true,
         threshold: 0.6,
@@ -68,9 +72,10 @@ export const searchCars = async (req, res) => {
       };
 
       const fuse = new Fuse(cars, fuseOptions);
-      const searchResult = fuse.search(name);
+      const searchResult = fuse.search({
+        $or: [{ brand: searchBrand }, { name: searchName }],
+      });
 
-      // Sort results by Fuse.js score and limit to items with score < 0.6
       cars = searchResult
         .filter((result) => result.score < 0.6)
         .map((result) => result.item);
