@@ -7,6 +7,8 @@ import CarItem from "../components/UI/CarItem";
 import Header from "../components/header/Header";
 import Footer from "../components/Footer/Footer";
 import { useLocation } from "react-router-dom"; // Lấy query params
+import FindCarForm from "../components/UI/FindCarForm";
+
 import axiosInstance from "../lib/axios";
 
 const SearchResults = () => {
@@ -48,11 +50,13 @@ const SearchResults = () => {
       <Header />
       <Helmet title="Search Results">
         <h1 className="text-center mt-3">Kết quả tìm kiếm</h1>
-
+        <div className="d-flex justify-content-center">
+          <FindCarForm />
+        </div>
         <section>
           <Container>
             <Row>
-              <Col lg="12">
+              {/* <Col lg="12">
                 <div className="d-flex align-items-center gap-3 mb-5">
                   <span className="d-flex align-items-center gap-2">
                     <i className="ri-sort-asc"></i> Tìm kiếm theo
@@ -64,7 +68,7 @@ const SearchResults = () => {
                     <option value="high">Cao đến thấp</option>
                   </select>
                 </div>
-              </Col>
+              </Col> */}
 
               {loading ? (
                 <p>Đang tải...</p>
