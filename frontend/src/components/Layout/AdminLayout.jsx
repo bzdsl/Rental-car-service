@@ -1,7 +1,7 @@
 /** @format */
 import React from "react";
-import AdminSidebar from "../../pages/AdminPages/AdminSidebar";
-import AdminHeader from "../../pages/AdminPages/AdminHeader";
+import AdminSidebar from "../UI/Admin/AdminSidebar";
+import AdminHeader from "../Header/AdminHeader";
 // import "../../styles/AdminStyle/adminlayout.css";
 
 const AdminLayout = ({ children }) => {
