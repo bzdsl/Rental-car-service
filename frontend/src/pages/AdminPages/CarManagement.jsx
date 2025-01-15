@@ -6,6 +6,7 @@ import AdminLayout from "../../components/Layout/AdminLayout";
 import "../../styles/AdminStyle/adminpage.css";
 import { useCarStore } from "../../stores/useCarStore";
 import CreateCarModal from "../../components/UI/Admin/CreateCarModal";
+import { Spinner } from "react-bootstrap"; // Import Spinner
 
 const CarManagement = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -56,7 +57,13 @@ const CarManagement = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="6">Đang tải dữ liệu...</td>
+                <td colSpan="7" className="text-center">
+                  <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{ height: "400px" }}>
+                    <Spinner animation="border" variant="primary" />
+                  </div>
+                </td>
               </tr>
             ) : cars && cars.length > 0 ? (
               cars.map((car, index) => (
@@ -69,7 +76,6 @@ const CarManagement = () => {
                       alt={car.name}
                     />
                   </td>
-
                   <td>{car.name}</td>
                   <td>{car.category}</td>
                   <td>{car.brand}</td>
@@ -90,7 +96,7 @@ const CarManagement = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="6">Không có dữ liệu để hiển thị.</td>
+                <td colSpan="7">Không có dữ liệu để hiển thị.</td>
               </tr>
             )}
           </tbody>

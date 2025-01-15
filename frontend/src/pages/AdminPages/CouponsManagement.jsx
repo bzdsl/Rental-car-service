@@ -5,6 +5,7 @@ import AdminLayout from "../../components/Layout/AdminLayout";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../lib/axios";
 import { toast } from "react-hot-toast";
+import { Spinner } from "react-bootstrap";
 
 const CouponsManagement = () => {
   const [coupons, setCoupons] = useState([]);
@@ -59,9 +60,10 @@ const CouponsManagement = () => {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="admin-section">
-          <h1 className="section-title mt-5">Quản lý mã giảm giá</h1>
-          <p>Đang tải...</p>
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ height: "400px" }}>
+          <Spinner animation="border" variant="primary" />
         </div>
       </AdminLayout>
     );
@@ -102,8 +104,8 @@ const CouponsManagement = () => {
                 <th>STT</th>
                 <th>Mã giảm giá</th>
                 <th>Phần trăm giảm</th>
-                <th>Ngày hết hạn</th>
                 <th>Ngày tạo</th>
+                <th>Ngày hết hạn</th>
                 <th>Trạng thái</th>
                 <th>Hành động</th>
               </tr>
@@ -121,13 +123,14 @@ const CouponsManagement = () => {
                     <td>{coupon.code}</td>
                     <td>{coupon.discount}%</td>
                     <td>
-                      {new Date(coupon.validUntil).toLocaleDateString("vi-VN")}
-                    </td>
-                    <td>
                       {coupon.createAt
                         ? new Date(coupon.createAt).toLocaleDateString("vi-VN")
                         : "N/A"}
                     </td>
+                    <td>
+                      {new Date(coupon.validUntil).toLocaleDateString("vi-VN")}
+                    </td>
+
                     <td>
                       <span
                         className={`badge ${

@@ -1,8 +1,8 @@
 /** @format */
 import React from "react";
-import AdminSidebar from "./AdminSidebar";
-import AdminHeader from "./AdminHeader";
-import AdminOverview from "./AdminOverview";
+import AdminSidebar from "../../components/UI/Admin/AdminSidebar";
+import AdminHeader from "../../components/Header/AdminHeader";
+import AdminOverview from "../../components/UI/Admin/AdminOverview";
 
 import "../../styles/AdminStyle/adminpage.css";
 

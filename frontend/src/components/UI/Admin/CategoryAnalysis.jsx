@@ -1,14 +1,6 @@
 /** @format */
 
 import React, { useState } from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-  Tooltip,
-} from "recharts";
 
 const CategoryAnalysis = ({ categoryRevenue }) => {
   const [viewType, setViewType] = useState("bookings"); // 'bookings' or 'revenue'
@@ -32,15 +24,6 @@ const CategoryAnalysis = ({ categoryRevenue }) => {
     revenue: category.totalRevenue,
   }));
 
-  const COLORS = [
-    "#0088FE",
-    "#00C49F",
-    "#FFBB28",
-    "#FF8042",
-    "#8884d8",
-    "#82ca9d",
-  ];
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -55,16 +38,34 @@ const CategoryAnalysis = ({ categoryRevenue }) => {
         <h2 className="text-lg font-bold">Phân tích theo loại xe</h2>
         <div className="flex gap-2">
           <button
-            className={`px-4 py-2 rounded ${
-              viewType === "bookings" ? "bg-blue-500 text-white" : "bg-gray-200"
-            }`}
+            style={{
+              backgroundColor: viewType === "bookings" ? "#000d6b" : "#f0f0f0",
+              color: viewType === "bookings" ? "white" : "#333",
+              padding: "8px 16px",
+              borderRadius: "8px",
+              border: "none",
+              cursor: "pointer",
+              boxShadow:
+                viewType === "bookings"
+                  ? "0 4px 6px rgba(0, 0, 0, 0.1)"
+                  : "none",
+            }}
             onClick={() => setViewType("bookings")}>
             Theo lượt thuê
           </button>
           <button
-            className={`px-4 py-2 rounded ${
-              viewType === "revenue" ? "bg-blue-500 text-white" : "bg-gray-200"
-            }`}
+            style={{
+              backgroundColor: viewType === "revenue" ? "#000d6b" : "#f0f0f0",
+              color: viewType === "revenue" ? "white" : "#333",
+              padding: "8px 16px",
+              borderRadius: "8px",
+              border: "none",
+              cursor: "pointer",
+              boxShadow:
+                viewType === "revenue"
+                  ? "0 4px 6px rgba(0, 0, 0, 0.1)"
+                  : "none",
+            }}
             onClick={() => setViewType("revenue")}>
             Theo doanh thu
           </button>
@@ -72,41 +73,12 @@ const CategoryAnalysis = ({ categoryRevenue }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="w-full h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey={
-                  viewType === "bookings" ? "bookingValue" : "revenueValue"
-                }
-                label={({ name, value }) => `${name} (${value.toFixed(1)}%)`}>
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip
-                formatter={(value, name) => [`${value.toFixed(1)}%`, name]}
-              />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead className="bg-gray-100">
+        <div className="table-responsive overflow-x-auto">
+          <table className="table admin-table w-full border-collapse">
+            <thead>
               <tr>
                 <th className="border p-2 text-left">Loại xe</th>
-                <th className="border p-2 text-right">Số lượt thuê</th>
+                <th className="border p-2 text-right">Lượt thuê</th>
                 <th className="border p-2 text-right">Doanh thu</th>
                 <th className="border p-2 text-right">
                   Tỷ lệ ({viewType === "bookings" ? "lượt thuê" : "doanh thu"})

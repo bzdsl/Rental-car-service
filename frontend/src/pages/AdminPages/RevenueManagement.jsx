@@ -5,6 +5,8 @@ import AdminLayout from "../../components/Layout/AdminLayout";
 import axiosInstance from "../../lib/axios";
 import CategoryAnalysis from "../../components/UI/Admin/CategoryAnalysis";
 import { Bar } from "react-chartjs-2";
+import { Spinner } from "react-bootstrap";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -80,7 +82,7 @@ const RevenueManagement = () => {
       {
         label: "Doanh thu",
         data: Object.values(data.revenueByType),
-        backgroundColor: "rgba(75, 192, 192, 0.6)",
+        backgroundColor: "#000d6b",
       },
     ],
   };
@@ -121,12 +123,15 @@ const RevenueManagement = () => {
       },
     },
   };
+  // import { Spinner } from "react-bootstrap";
 
   if (loading) {
     return (
       <AdminLayout>
-        <div className="admin-section">
-          <p>Đang tải dữ liệu...</p>
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ height: "400px" }}>
+          <Spinner animation="border" variant="primary" />
         </div>
       </AdminLayout>
     );
@@ -178,11 +183,12 @@ const RevenueManagement = () => {
           style={{ maxWidth: "100%" }}>
           <Bar data={chartData} options={chartOptions} />
         </div>
-
+        {/* theo danh mục */}
         {categoryRevenue.length > 0 && (
           <CategoryAnalysis categoryRevenue={categoryRevenue} />
         )}
 
+        {/* theo mẫu xe */}
         <h2 className="text-lg font-bold mb-4">
           Các mẫu xe được yêu chuộng nhất
         </h2>
@@ -190,9 +196,9 @@ const RevenueManagement = () => {
           <table className="table admin-table w-full border-collapse">
             <thead>
               <tr>
-                <th className="border p-2">STT</th>
+                <th className="border p-2"></th>
                 <th className="border p-2">Tên xe</th>
-                <th className="border p-2">Số lần thuê</th>
+                <th className="border p-2">Lượt thuê</th>
               </tr>
             </thead>
             <tbody>
