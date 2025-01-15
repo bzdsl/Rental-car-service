@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../components/Layout/AdminLayout";
 import axiosInstance from "../../lib/axios";
+import CategoryAnalysis from "../../components/UI/Admin/CategoryAnalysis";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -84,6 +85,43 @@ const RevenueManagement = () => {
     ],
   };
 
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Thống kê doanh thu theo thời gian",
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text:
+            filter.type === "year"
+              ? "Năm"
+              : filter.type === "month"
+              ? "Tháng"
+              : "Ngày",
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Doanh thu (VNĐ)",
+        },
+        ticks: {
+          callback: function (value) {
+            return formatCurrency(value);
+          },
+        },
+      },
+    },
+  };
+
   if (loading) {
     return (
       <AdminLayout>
@@ -138,38 +176,12 @@ const RevenueManagement = () => {
         <div
           className="chart-container mx-auto mb-6"
           style={{ maxWidth: "100%" }}>
-          <Bar data={chartData} />
+          <Bar data={chartData} options={chartOptions} />
         </div>
 
-        {/* <h2 className="text-lg font-bold mb-4">Thống kê theo loại xe</h2>
-        <div className="table-responsive overflow-x-auto">
-          <table className="table admin-table w-full border-collapse">
-            <thead>
-              <tr>
-                <th className="border p-2">STT</th>
-                <th className="border p-2">Loại xe</th>
-                <th className="border p-2">Số lần thuê</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categoryRevenue.length > 0 ? (
-                categoryRevenue.map((category, index) => (
-                  <tr key={category._id}>
-                    <td className="border p-2">{index + 1}</td>
-                    <td className="border p-2">{category.name}</td>
-                    <td className="border p-2">{category.count}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3" className="text-center border p-2">
-                    Không có dữ liệu
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div> */}
+        {categoryRevenue.length > 0 && (
+          <CategoryAnalysis categoryRevenue={categoryRevenue} />
+        )}
 
         <h2 className="text-lg font-bold mb-4">
           Các mẫu xe được yêu chuộng nhất

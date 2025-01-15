@@ -27,12 +27,12 @@ export const Revenue = async (req, res) => {
       0
     );
 
-    // Group revenue by the specified type
+    // Group revenue by the specified type and sort by date
     const revenueByType = {};
     bookings.forEach((booking) => {
       const dateKey =
         type === "year"
-          ? new Date(booking.startDate).getFullYear()
+          ? new Date(booking.startDate).getFullYear().toString()
           : type === "month"
           ? `${new Date(booking.startDate).getFullYear()}-${(
               new Date(booking.startDate).getMonth() + 1
@@ -45,9 +45,17 @@ export const Revenue = async (req, res) => {
         (revenueByType[dateKey] || 0) + booking.totalPrice;
     });
 
+    // Convert to array, sort by date, and convert back to object
+    const sortedRevenue = Object.entries(revenueByType)
+      .sort(([dateA], [dateB]) => new Date(dateA) - new Date(dateB))
+      .reduce((obj, [key, value]) => {
+        obj[key] = value;
+        return obj;
+      }, {});
+
     res.status(200).json({
       totalRevenue,
-      revenueByType,
+      revenueByType: sortedRevenue,
     });
   } catch (error) {
     console.error(error);
@@ -89,7 +97,7 @@ export const revenueByCategories = async (req, res) => {
           status: "completed",
         },
       },
-      // Lookup để lấy thông tin xe
+      // Lookup để lấy thông tin xe từ bảng cars
       {
         $lookup: {
           from: "cars",
@@ -99,22 +107,13 @@ export const revenueByCategories = async (req, res) => {
         },
       },
       { $unwind: "$carDetails" },
-      // Lookup để lấy thông tin category
-      {
-        $lookup: {
-          from: "categories",
-          localField: "carDetails.category",
-          foreignField: "_id",
-          as: "categoryDetails",
-        },
-      },
-      { $unwind: "$categoryDetails" },
-      // Group theo category để đếm số lần thuê
+      // Group theo category để tính tổng
       {
         $group: {
-          _id: "$categoryDetails._id",
-          name: { $first: "$categoryDetails.name" },
+          _id: "$carDetails.category",
+          name: { $first: "$carDetails.category" },
           count: { $sum: 1 },
+          totalRevenue: { $sum: "$totalPrice" },
         },
       },
       // Sắp xếp theo số lần thuê nhiều nhất
