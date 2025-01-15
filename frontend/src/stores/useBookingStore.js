@@ -260,11 +260,15 @@ export const useBookingStore = create((set, get) => ({
 }));
 
 // Utility functions
+
 export const formatPrice = (price) => {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(price);
+  return price
+    .toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    })
+    .replace(/\./g, ","); // Thay dấu chấm thành dấu phẩy
 };
 
 export const formatDate = (dateString) => {

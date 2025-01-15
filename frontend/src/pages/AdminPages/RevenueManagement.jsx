@@ -69,11 +69,13 @@ const RevenueManagement = () => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      maximumFractionDigits: 0,
-    }).format(amount);
+    return amount
+      .toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
+        maximumFractionDigits: 0,
+      })
+      .replace(/\./g, ","); // Thay dấu chấm thành dấu phẩy
   };
 
   const chartData = {
@@ -123,7 +125,6 @@ const RevenueManagement = () => {
       },
     },
   };
-  // import { Spinner } from "react-bootstrap";
 
   if (loading) {
     return (

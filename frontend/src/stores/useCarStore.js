@@ -124,3 +124,12 @@ export const useCarStore = create((set) => ({
     }
   },
 }));
+export const formatPrice = (amount) => {
+  return amount
+    .toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    })
+    .replace(/\./g, ","); // Thay dấu chấm thành dấu phẩy
+};

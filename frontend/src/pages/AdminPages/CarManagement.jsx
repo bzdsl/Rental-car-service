@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // For navigation
 import AdminLayout from "../../components/Layout/AdminLayout";
 import "../../styles/AdminStyle/adminpage.css";
-import { useCarStore } from "../../stores/useCarStore";
+import { useCarStore, formatPrice } from "../../stores/useCarStore";
 import CreateCarModal from "../../components/UI/Admin/CreateCarModal";
 import { Spinner } from "react-bootstrap"; // Import Spinner
 
@@ -79,7 +79,7 @@ const CarManagement = () => {
                   <td>{car.name}</td>
                   <td>{car.category}</td>
                   <td>{car.brand}</td>
-                  <td>{car.price}</td>
+                  <td>{formatPrice(car.price)}</td>
                   <td>
                     <button
                       onClick={() => handleEditCar(car._id)}

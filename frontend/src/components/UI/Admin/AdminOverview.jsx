@@ -14,7 +14,15 @@ const AdminOverview = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const formatCurrency = (amount) => {
+    return amount
+      .toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
+        maximumFractionDigits: 0,
+      })
+      .replace(/\./g, ","); // Thay dấu chấm thành dấu phẩy
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -137,7 +145,7 @@ const AdminOverview = () => {
             <div>
               <p className="text-sm text-gray-600">Doanh thu tháng này</p>
               <p className="text-2xl font-bold text-gray-800">
-                {revenue.currentMonth.toLocaleString("vi-VN")} đ
+                {formatCurrency(revenue.currentMonth)} đ
               </p>
             </div>
           </div>
