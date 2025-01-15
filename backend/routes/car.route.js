@@ -12,6 +12,7 @@ import {
   toggleFeaturedCar,
   updateCar,
   carCount,
+  getSortedCars,
 } from "../controllers/car.controller.js";
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.get("/", getAllCars);
 router.get("/featured", getFeaturedCars);
 router.get("/recommendations", getRecommendedCars);
 router.get("/category/:category", getCarsByCategory);
+router.get("/sort", getSortedCars);
 router.post("/", protectRoute, adminRoute, createCar);
 router.patch("/:id", protectRoute, adminRoute, updateCar);
 router.patch("/:id", protectRoute, adminRoute, toggleFeaturedCar);

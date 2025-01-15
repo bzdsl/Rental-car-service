@@ -180,3 +180,22 @@ export const carCount = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getSortedCars = async (req, res) => {
+  try {
+    const { sortBy } = req.query;
+    let sortOrder = {};
+
+    if (sortBy === "low") {
+      sortOrder = { price: 1 }; // tăng dần
+    } else if (sortBy === "high") {
+      sortOrder = { price: -1 }; // giảm dần
+    }
+
+    const cars = await Car.find().sort(sortOrder);
+    res.status(200).json({ cars });
+  } catch (error) {
+    console.log("Error in get sorted cars", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
