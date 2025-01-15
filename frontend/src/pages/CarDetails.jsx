@@ -107,7 +107,7 @@ const CarDetails = () => {
     }
   };
 
-  if (!singleCarItem) return <div>Car not found</div>;
+  if (!singleCarItem) return <div>Không tìm thấy phương tiện</div>;
 
   return (
     <>

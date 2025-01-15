@@ -2,12 +2,16 @@
 
 import React from "react";
 import { Col } from "reactstrap";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import "../../styles/car-item.css";
 
 const CarItem = ({ item }) => {
-  const { image, category, brand, price, name, _id, description } = item;
-  const navigate = useNavigate(); // Hook useNavigate để điều hướng
+  const { image, category, brand, price, name, _id } = item;
+  const navigate = useNavigate();
+
+  const formatPrice = (price) => {
+    return price.toLocaleString(); // Sử dụng toLocaleString thay vì Intl.NumberFormat
+  };
 
   return (
     <Col lg="4" md="4" sm="6" className="mb-5">
@@ -19,7 +23,7 @@ const CarItem = ({ item }) => {
         <div className="car__item-content mt-4">
           <h4 className="section__title text-center">{name}</h4>
           <h6 className="rent__price text-center mt-3">
-            {price}đ <span>/ Ngày</span>
+            {formatPrice(price)}đ <span>/ Ngày</span>
           </h6>
 
           <div className="car__item-info d-flex align-items-center justify-content-between mt-3 mb-4">
@@ -31,11 +35,9 @@ const CarItem = ({ item }) => {
             </span>
           </div>
 
-          {/* Giữ nguyên nút "Chi tiết" với CSS và điều hướng bằng navigate */}
           <button
             className="w-50 car__item-btn car__btn-rent"
-            onClick={() => navigate(`/cars/${_id}`)} // Điều hướng tới trang chi tiết
-          >
+            onClick={() => navigate(`/cars/${_id}`)}>
             Chi tiết
           </button>
         </div>

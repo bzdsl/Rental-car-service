@@ -10,11 +10,19 @@ export const useCarStore = create((set) => ({
   selectedCar: null, // New state for selected car
 
   setCars: (cars) => set({ cars }),
-
   // Action to set selected car
   setSelectedCar: (car) => set({ selectedCar: car }),
 
-  // Action to set rental dates
+  fetchSortedCars: async (sortBy) => {
+    set({ loading: true });
+    try {
+      const response = await axiosInstance.get(`/cars/sort?sortBy=${sortBy}`);
+      set({ cars: response.data.cars, loading: false });
+    } catch (error) {
+      set({ loading: false });
+      toast.error("Không thể tải danh sách xe");
+    }
+  },
 
   createCar: async (carData) => {
     set({ loading: true });

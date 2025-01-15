@@ -56,20 +56,6 @@ const SearchResults = () => {
         <section>
           <Container>
             <Row>
-              {/* <Col lg="12">
-                <div className="d-flex align-items-center gap-3 mb-5">
-                  <span className="d-flex align-items-center gap-2">
-                    <i className="ri-sort-asc"></i> Tìm kiếm theo
-                  </span>
-
-                  <select>
-                    <option>Chọn</option>
-                    <option value="low">Thấp đến cao</option>
-                    <option value="high">Cao đến thấp</option>
-                  </select>
-                </div>
-              </Col> */}
-
               {loading ? (
                 <p>Đang tải...</p>
               ) : cars.length === 0 ? (
