@@ -11,7 +11,7 @@ const slideData = [
     title: "Thuê xe ngay",
     heading: "Với chương trình khuyến mãi đầu năm",
     subHeading:
-      "Nhập mã FIRST10 để được giảm ngay 10% tổng giá trị hóa đơn khi thanh toán",
+      "Nhập mã JANUARY20 để được giảm ngay 20% tổng giá trị hóa đơn khi thanh toán",
     buttonText: "Thuê xe",
     link: "/cars",
   },
@@ -19,7 +19,7 @@ const slideData = [
     title: "Thuê xe ngay",
     heading: "Với chương trình khuyến mãi đầu năm",
     subHeading:
-      "Nhập mã FIRST10 để được giảm ngay 10% tổng giá trị hóa đơn khi thanh toán",
+      "Nhập mã JANUARY20 để được giảm ngay 20% tổng giá trị hóa đơn khi thanh toán",
     buttonText: "Thuê xe",
     link: "/cars",
   },
@@ -27,7 +27,7 @@ const slideData = [
     title: "Thuê xe ngay",
     heading: "Với chương trình khuyến mãi đầu năm",
     subHeading:
-      "Nhập mã FIRST10 để được giảm ngay 10% tổng giá trị hóa đơn khi thanh toán",
+      "Nhập mã JANUARY20 để được giảm ngay 20% tổng giá trị hóa đơn khi thanh toán",
     buttonText: "Thuê xe",
     link: "/cars",
   },
