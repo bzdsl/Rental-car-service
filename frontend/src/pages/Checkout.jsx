@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Form, FormGroup, Input, Label } from "reactstrap";
 import { message } from "antd";
-import Header from "../components/header/Header";
+import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import { useCarStore } from "../stores/useCarStore";
 import { useBookingStore } from "../stores/useBookingStore";

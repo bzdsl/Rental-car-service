@@ -25,11 +25,6 @@ export const useBookingStore = create((set, get) => ({
     discountAmount: 0,
     rentalDays: 0,
   },
-  DISCOUNT_CODES: {
-    FIRST10: { type: "percent", value: 10 },
-    SUMMER20: { type: "percent", value: 20 },
-    WEEKEND50: { type: "fixed", value: 50000 },
-  },
 
   // Booking History Actions
   fetchBookings: async () => {

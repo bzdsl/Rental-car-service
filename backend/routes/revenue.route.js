@@ -19,6 +19,6 @@ router.get(
 );
 
 // Most rented cars API
-router.get("/most-rented", protectRoute, adminRoute, mostRevenue);
+router.get("/most-rented", mostRevenue);
 
 export default router;

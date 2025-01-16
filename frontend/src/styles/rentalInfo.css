@@ -1,0 +1,12 @@
+/** @format */
+
+.custom-btn {
+  background-color: #000d6b;
+  color: white;
+  border: 1px solid #000d6b;
+}
+
+.custom-btn:hover {
+  background-color: #000b59; /* Sử dụng màu tối hơn cho hiệu ứng hover */
+  border-color: #000b59;
+}

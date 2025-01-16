@@ -1,7 +1,5 @@
 /** @format */
 
-/** @format */
-
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/Home";
@@ -28,6 +26,7 @@ import EditBooking from "../pages/AdminPages/EditBooking";
 import RevenueManagement from "../pages/AdminPages/RevenueManagement";
 import CouponsManagement from "../pages/AdminPages/CouponsManagement";
 import CouponForm from "../components/UI/Admin/CouponForm";
+import ForgotPassword from "../components/UI/ForgotPassword";
 
 import SearchResults from "../pages/SearchResults";
 
@@ -55,6 +54,8 @@ const Routers = () => {
         path="/rental-info"
         element={user ? <RentalInfo /> : <Navigate to="/login" />}
       />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+
       <Route path="*" element={<NotFound />} />
       <Route
         path="/register"

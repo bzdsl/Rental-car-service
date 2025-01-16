@@ -6,7 +6,7 @@ import { useUserStore } from "../stores/useUserStore"; // Import your user store
 import { Button, Form, FormGroup, Label, Input, Alert } from "reactstrap";
 import { motion } from "framer-motion";
 import { FiUser, FiMail, FiPhone, FiLock } from "react-icons/fi";
-import Header from "../components/header/Header";
+import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 
 const Register = () => {

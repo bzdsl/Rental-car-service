@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../../components/Layout/AdminLayout";
-import "../../styles/AdminStyle/adminpage.css";
 import { Alert, Button, Modal, Spinner } from "react-bootstrap";
 import axiosInstance from "../../lib/axios";
 import { formatDate, formatPrice } from "../../stores/useBookingStore";
@@ -23,10 +22,20 @@ const RentManagement = () => {
   const [searchEndDate, setSearchEndDate] = useState("");
   const [viewType, setViewType] = useState("all");
 
-  const fetchBookings = async () => {
+  const fetchBookings = async (searchParams = {}) => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get("/bookings/all-bookings");
+      const queryParams = new URLSearchParams({
+        searchId,
+        searchEmail,
+        startDate: searchStartDate,
+        endDate: searchEndDate,
+        status: viewType,
+      }).toString();
+
+      const response = await axiosInstance.get(
+        `/bookings/all-bookings?${queryParams}`
+      );
       setBookings(response.data);
       setError(null);
     } catch (err) {
@@ -35,11 +44,6 @@ const RentManagement = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchBookings();
-  }, []);
-
   const updateBookingStatus = async (bookingId, newStatus) => {
     try {
       if (newStatus === "cancelled") {
@@ -59,16 +63,14 @@ const RentManagement = () => {
       alert(err.response?.data?.message || "Failed to update booking status");
     }
   };
+  // Fetch bookings when search params change
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      fetchBookings();
+    }, 500); // Debounce search by 500ms
 
-  const getStatusBadgeClass = (status) => {
-    const statusClasses = {
-      pending: "bg-warning",
-      confirmed: "bg-info",
-      completed: "bg-success",
-      cancelled: "bg-danger",
-    };
-    return `badge ${statusClasses[status.toLowerCase()] || "bg-secondary"}`;
-  };
+    return () => clearTimeout(debounceTimer);
+  }, [searchId, searchEmail, searchStartDate, searchEndDate, viewType]);
 
   // Reset all filters
   const handleResetFilters = () => {
@@ -79,43 +81,15 @@ const RentManagement = () => {
     setViewType("all");
   };
 
-  // Filter bookings based on search criteria and view type
-  const filteredBookings = bookings.filter((booking) => {
-    const matchesId = booking._id
-      .toLowerCase()
-      .includes(searchId.toLowerCase());
-    const matchesEmail = booking.email
-      .toLowerCase()
-      .includes(searchEmail.toLowerCase());
-    const matchesStartDate = searchStartDate
-      ? new Date(booking.startDate).toISOString().split("T")[0] ===
-        searchStartDate
-      : true;
-    const matchesEndDate = searchEndDate
-      ? new Date(booking.endDate).toISOString().split("T")[0] === searchEndDate
-      : true;
-    const matchesStatus = viewType === "all" || booking.status === viewType;
-
-    return (
-      matchesId &&
-      matchesEmail &&
-      matchesStartDate &&
-      matchesEndDate &&
-      matchesStatus
-    );
-  });
-
-  if (loading) {
-    return (
-      <AdminLayout>
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{ height: "400px" }}>
-          <Spinner animation="border" variant="primary" />
-        </div>
-      </AdminLayout>
-    );
-  }
+  const getStatusBadgeClass = (status) => {
+    const statusClasses = {
+      pending: "bg-warning",
+      confirmed: "bg-info",
+      completed: "bg-success",
+      cancelled: "bg-danger",
+    };
+    return `badge ${statusClasses[status.toLowerCase()] || "bg-secondary"}`;
+  };
 
   return (
     <AdminLayout>
@@ -128,42 +102,45 @@ const RentManagement = () => {
         <div className="search-filter-container mb-4 p-3 bg-light rounded">
           <div className="row g-3">
             <div className="col-md-3">
+              <label className="form-label">Tìm theo ID</label>
               <input
                 type="text"
                 className="form-control"
-                placeholder="Tìm theo ID..."
+                placeholder="Nhập ID"
                 value={searchId}
                 onChange={(e) => setSearchId(e.target.value)}
               />
             </div>
 
             <div className="col-md-3">
+              <label className="form-label">Tìm theo email</label>
+
               <input
                 type="text"
                 className="form-control"
-                placeholder="Tìm theo email..."
+                placeholder="Nhập email "
                 value={searchEmail}
                 onChange={(e) => setSearchEmail(e.target.value)}
               />
             </div>
 
             <div className="col-md-3">
+              <label className="form-label">Ngày bắt đầu</label>
               <input
                 type="date"
                 className="form-control"
                 value={searchStartDate}
                 onChange={(e) => setSearchStartDate(e.target.value)}
-                placeholder="Ngày bắt đầu"
               />
             </div>
 
             <div className="col-md-3">
+              <label className="form-label">Ngày kết thúc</label>
               <input
                 type="date"
                 className="form-control"
                 value={searchEndDate}
                 onChange={(e) => setSearchEndDate(e.target.value)}
-                placeholder="Ngày kết thúc"
               />
             </div>
           </div>
@@ -215,6 +192,7 @@ const RentManagement = () => {
 
         {error && <Alert variant="danger">{error}</Alert>}
 
+        {/* Booking Table */}
         <div className="table-responsive">
           <table className="table admin-table">
             <thead>
@@ -230,7 +208,7 @@ const RentManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredBookings.map((booking) => (
+              {bookings.map((booking) => (
                 <tr key={booking._id}>
                   <td>{booking._id.slice(-6).toUpperCase()}</td>
                   <td>
@@ -268,7 +246,7 @@ const RentManagement = () => {
                   </td>
                 </tr>
               ))}
-              {filteredBookings.length === 0 && (
+              {bookings.length === 0 && (
                 <tr>
                   <td colSpan="8" className="text-center">
                     Không có dữ liệu đặt xe

@@ -2,12 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Spinner, Alert, Button, Modal, Dropdown } from "react-bootstrap";
+import { Spinner, Alert, Button, Modal } from "react-bootstrap";
 import {
   useBookingStore,
   formatPrice,
   formatDate,
 } from "../stores/useBookingStore";
+import "../styles/rentalinfo.css";
 import Header from "../components/Header/Header";
 
 const RentalInfo = () => {
@@ -108,20 +109,43 @@ const RentalInfo = () => {
         {successMessage && <Alert variant="success">{successMessage}</Alert>}
 
         <div className="mb-4">
-          <Dropdown onSelect={handleStatusChange}>
-            <Dropdown.Toggle variant="primary" id="dropdown-basic">
-              {statusFilter === "all"
-                ? "Tất cả trạng thái"
-                : `Trạng thái: ${statusFilter}`}
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-              <Dropdown.Item eventKey="all">Tất cả trạng thái</Dropdown.Item>
-              <Dropdown.Item eventKey="pending">Chờ xử lý</Dropdown.Item>
-              <Dropdown.Item eventKey="confirmed">Đã xác nhận</Dropdown.Item>
-              <Dropdown.Item eventKey="cancelled">Đã hủy</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+          {/* setTypeView hiển thị các trạng thái */}
+          <div className="btn-group" role="group" aria-label="Status filter">
+            <Button
+              variant={statusFilter === "all" ? "primary" : "outline-primary"}
+              onClick={() => handleStatusChange("all")}>
+              Tất cả trạng thái
+            </Button>
+            <Button
+              variant={
+                statusFilter === "pending" ? "primary" : "outline-primary"
+              }
+              onClick={() => handleStatusChange("pending")}>
+              Chờ xử lý
+            </Button>
+            <Button
+              variant={
+                statusFilter === "confirmed" ? "primary" : "outline-primary"
+              }
+              onClick={() => handleStatusChange("confirmed")}>
+              Đã xác nhận
+            </Button>
+            <Button
+              variant={
+                statusFilter === "completed" ? "primary" : "outline-primary"
+              }
+              onClick={() => handleStatusChange("completed")}>
+              Đã hoàn thành
+            </Button>
+            <Button
+              variant={
+                statusFilter === "cancelled" ? "primary" : "outline-primary"
+              }
+              onClick={() => handleStatusChange("cancelled")}>
+              Đã hủy
+            </Button>
+            {/* Added completed status button */}
+          </div>
         </div>
 
         <div className="space-y-6">

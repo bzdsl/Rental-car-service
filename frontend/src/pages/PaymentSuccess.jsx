@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Result, message } from "antd";
 import axiosInstance from "../lib/axios";
-import "../styles/payment-success.css"; // Đảm bảo bạn tạo file CSS riêng
+import "../styles/payment-success.css";
 
 const PaymentSuccess = () => {
   const location = useLocation();
@@ -25,9 +25,6 @@ const PaymentSuccess = () => {
           console.error(
             "Error confirming payment:",
             error.response?.data || error.message
-          );
-          message.error(
-            "Có lỗi xảy ra khi xử lý thanh toán. Vui lòng thử lại."
           );
         }
       }

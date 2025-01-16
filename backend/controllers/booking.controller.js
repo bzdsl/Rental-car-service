@@ -193,21 +193,33 @@ export const cancelBooking = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy đơn thuê" });
     }
 
-    // Check if user owns this booking
+    // Check permissions
+    if (req.user.role === "admin") {
+      // Admin can cancel any booking
+      booking.status = "cancelled";
+      await booking.save();
+
+      return res.status(200).json({
+        message: "Hủy đơn thuê thành công",
+        booking,
+      });
+    }
+
+    // Regular user restrictions
     if (!booking.user || booking.user.toString() !== req.user._id.toString()) {
       return res
         .status(403)
         .json({ message: "Bạn không có quyền hủy đơn thuê này" });
     }
 
-    // Check if booking status is pending
+    // Check if booking status is pending for regular users
     if (booking.status !== "pending") {
       return res.status(400).json({
         message: "Chỉ có thể hủy đơn thuê đang ở trạng thái chờ xử lý",
       });
     }
 
-    // Check if current date is before start date
+    // Check date restrictions for regular users
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const startDate = new Date(booking.startDate);
@@ -267,20 +279,75 @@ export const getAllBookings = async (req, res) => {
   if (req.user.role !== "admin") {
     return res.status(403).json({ message: "Không có quyền truy cập" });
   }
+
   try {
-    const bookings = await Booking.find()
+    const {
+      searchId = "",
+      searchEmail = "",
+      startDate,
+      endDate,
+      status = "all",
+    } = req.query;
+
+    // Xây dựng query object
+    let query = {};
+
+    // Tìm theo ID
+    if (searchId) {
+      // Lấy tất cả bookings trước, sau đó filter theo ID ngắn
+      const allBookings = await Booking.find()
+        .populate("car", "name image price")
+        .populate("user", "fullName email")
+        .sort({ createdAt: -1 });
+
+      const filteredBookings = allBookings.filter((booking) =>
+        booking._id
+          .toString()
+          .slice(-6)
+          .toLowerCase()
+          .includes(searchId.toLowerCase())
+      );
+
+      return res.status(200).json(filteredBookings);
+    }
+
+    // Tìm theo email
+    if (searchEmail) {
+      query.email = new RegExp(searchEmail, "i");
+    }
+
+    // Tìm theo khoảng thời gian
+    if (startDate || endDate) {
+      query.startDate = {};
+      if (startDate) {
+        query.startDate.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        let endDateTime = new Date(endDate);
+        endDateTime.setHours(23, 59, 59, 999);
+        query.startDate.$lte = endDateTime;
+      }
+    }
+
+    // Tìm theo status
+    if (status && status !== "all") {
+      query.status = status;
+    }
+
+    const bookings = await Booking.find(query)
       .populate("car", "name image price")
       .populate("user", "fullName email")
       .sort({ createdAt: -1 });
+
     res.status(200).json(bookings);
   } catch (error) {
+    console.error("Search error:", error);
     res.status(500).json({
       message: "Lỗi lấy danh sách đặt xe",
       error: error.message,
     });
   }
 };
-
 export const getBookingById = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id).populate(
@@ -312,27 +379,54 @@ export const editBooking = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy đơn đặt xe" });
     }
 
-    // Kiểm tra quyền truy cập: Người dùng hoặc admin
-    if (
-      req.user.role !== "admin" &&
-      (!booking.user || booking.user.toString() !== req.user._id.toString())
-    ) {
-      return res
-        .status(403)
-        .json({ message: "Bạn không có quyền sửa đơn này" });
+    // Kiểm tra quyền truy cập: Admin có thể sửa mọi đơn
+    if (req.user.role === "admin") {
+      booking.fullName = fullName || booking.fullName;
+      booking.email = email || booking.email;
+      booking.phone = phone || booking.phone;
+      booking.pickupLocation = pickupLocation || booking.pickupLocation;
+      booking.pickupTime = pickupTime || booking.pickupTime;
+      booking.notes = notes || booking.notes;
+
+      await booking.save();
+      return res.status(200).json({ message: "Cập nhật thành công", booking });
     }
 
-    // Cập nhật thông tin
-    booking.fullName = fullName || booking.fullName;
-    booking.email = email || booking.email;
-    booking.phone = phone || booking.phone;
-    booking.pickupLocation = pickupLocation || booking.pickupLocation;
-    booking.pickupTime = pickupTime || booking.pickupTime;
-    booking.notes = notes || booking.notes;
+    // Kiểm tra quyền truy cập cho user thường
+    if (booking.user && booking.user.toString() === req.user._id.toString()) {
+      // Kiểm tra trạng thái và thời gian cho user thường
+      if (booking.status !== "pending") {
+        return res.status(403).json({
+          message: "Chỉ có thể chỉnh sửa đơn đặt xe ở trạng thái chờ xử lý",
+        });
+      }
 
-    await booking.save();
+      // Kiểm tra thời gian
+      const now = new Date();
+      const startDate = new Date(booking.startDate);
+      startDate.setHours(...booking.pickupTime.split(":").map(Number), 0, 0);
+      const TWO_HOURS = 2 * 60 * 60 * 1000;
 
-    res.status(200).json({ message: "Cập nhật thành công", booking });
+      if (now.getTime() + TWO_HOURS >= startDate.getTime()) {
+        return res.status(403).json({
+          message:
+            "Không thể chỉnh sửa đơn đặt xe trong vòng 2 tiếng trước giờ nhận xe",
+        });
+      }
+
+      // Cho phép user cập nhật thông tin
+      booking.email = email || booking.email;
+      booking.phone = phone || booking.phone;
+      booking.pickupLocation = pickupLocation || booking.pickupLocation;
+      booking.pickupTime = pickupTime || booking.pickupTime;
+      booking.notes = notes || booking.notes;
+
+      await booking.save();
+      return res.status(200).json({ message: "Cập nhật thành công", booking });
+    }
+
+    // Nếu không phải admin và không phải chủ đơn
+    return res.status(403).json({ message: "Bạn không có quyền sửa đơn này" });
   } catch (error) {
     console.error("Error updating booking:", error);
     res.status(500).json({ message: "Lỗi khi cập nhật thông tin đặt xe" });

@@ -241,25 +241,23 @@ const FindCarForm = () => {
             onChange={handleInputChange}>
             <option value="">Chọn khoảng giá</option>
             <option value="1000000-2000000">
-              1.000.000 VND - 2.000.000 VND
+              1,000,000 VND - 2,000,000 VND
             </option>
             <option value="2000000-3000000">
-              2.000.000 VND - 3.000.000 VND
+              2,000,000 VND - 3,000,000 VND
             </option>
             <option value="3000000-4000000">
-              3.000.000 VND - 4.000.000 VND
+              3,000,000 VND - 4,000,000 VND
             </option>
             <option value="4000000-5000000">
-              4.000.000 VND - 5.000.000 VND
+              4,000,000 VND - 5,000,000 VND
             </option>
-            <option value="5000000-10000000">
-              5.000.000 VND - 10.000.000 VND
-            </option>
+            <option value="5000000-10000000">Trên 5,000,000 VND</option>
           </Input>
         </FormGroup>
 
         <FormGroup className="form__group">
-          <Label> .</Label>
+          <label htmlFor="">Tìm kiếm </label>
           <Button className="btn find__car-btn" type="submit">
             Tìm kiếm
           </Button>
