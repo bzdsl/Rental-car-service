@@ -49,7 +49,6 @@ export const validateCoupon = async (req, res) => {
   }
 };
 
-// In coupon.controller.js
 export const createCoupon = async (req, res) => {
   try {
     console.log("Request body:", req.body); // Log dữ liệu nhận từ client

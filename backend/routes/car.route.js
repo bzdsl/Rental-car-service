@@ -13,6 +13,8 @@ import {
   updateCar,
   carCount,
   getSortedCars,
+  searchCars,
+  getMetadata,
 } from "../controllers/car.controller.js";
 
 const router = express.Router();
@@ -21,6 +23,8 @@ router.get("/", getAllCars);
 router.get("/featured", getFeaturedCars);
 router.get("/recommendations", getRecommendedCars);
 router.get("/category/:category", getCarsByCategory);
+router.get("/search", searchCars);
+router.get("/metadata", getMetadata);
 router.get("/sort", getSortedCars);
 router.post("/", protectRoute, adminRoute, createCar);
 router.patch("/:id", protectRoute, adminRoute, updateCar);

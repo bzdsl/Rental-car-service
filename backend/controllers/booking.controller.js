@@ -381,6 +381,7 @@ export const editBooking = async (req, res) => {
 
     // Kiểm tra quyền truy cập: Admin có thể sửa mọi đơn
     if (req.user.role === "admin") {
+      // Admin can edit any booking
       booking.fullName = fullName || booking.fullName;
       booking.email = email || booking.email;
       booking.phone = phone || booking.phone;

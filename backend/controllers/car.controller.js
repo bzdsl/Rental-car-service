@@ -199,3 +199,40 @@ export const getSortedCars = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+export const searchCars = async (req, res) => {
+  try {
+    const { searchTerm, brand, category } = req.query;
+
+    // Build query object
+    const query = {};
+
+    if (searchTerm) {
+      query.name = { $regex: searchTerm, $options: "i" };
+    }
+
+    if (brand) {
+      query.brand = brand;
+    }
+
+    if (category) {
+      query.category = category;
+    }
+
+    const cars = await Car.find(query);
+    res.json({ cars });
+  } catch (error) {
+    console.error("Error in searchCars:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const getMetadata = async (req, res) => {
+  try {
+    const brands = await Car.distinct("brand");
+    const categories = await Car.distinct("category");
+    res.json({ brands, categories });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
