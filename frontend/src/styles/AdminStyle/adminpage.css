@@ -105,3 +105,19 @@
   height: 50px;
   object-fit: cover; /* Ensures the image covers the area without distortion */
 }
+
+.search-filter-container {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-filter-container .form-control,
+.search-filter-container .form-select {
+  height: 40px;
+}
+
+.search-filter-container .btn {
+  height: 40px;
+}

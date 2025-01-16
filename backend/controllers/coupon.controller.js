@@ -88,12 +88,11 @@ export const deleteCoupon = async (req, res) => {
   }
 };
 
-// coupon.controller.js
+// hien thi coupons
 export const getAllCoupons = async (req, res) => {
   try {
     const coupons = await Coupon.find({});
-    console.log("Number of coupons found:", coupons.length);
-    console.log("Coupons:", coupons);
+
     res.json(coupons);
   } catch (error) {
     console.error("Error:", error);

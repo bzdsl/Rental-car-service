@@ -1,4 +1,5 @@
 /** @format */
+
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../../components/Layout/AdminLayout";
 import "../../styles/AdminStyle/adminpage.css";
@@ -15,7 +16,13 @@ const RentManagement = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch all bookings - using existing endpoint
+  // Search states
+  const [searchId, setSearchId] = useState("");
+  const [searchEmail, setSearchEmail] = useState("");
+  const [searchStartDate, setSearchStartDate] = useState("");
+  const [searchEndDate, setSearchEndDate] = useState("");
+  const [viewType, setViewType] = useState("all");
+
   const fetchBookings = async () => {
     setLoading(true);
     try {
@@ -33,7 +40,6 @@ const RentManagement = () => {
     fetchBookings();
   }, []);
 
-  // Update booking status - using existing endpoints// Update booking status - using existing endpoints
   const updateBookingStatus = async (bookingId, newStatus) => {
     try {
       if (newStatus === "cancelled") {
@@ -50,12 +56,10 @@ const RentManagement = () => {
       setError(
         err.response?.data?.message || "Failed to update booking status"
       );
-      // Thêm thông báo lỗi cho người dùng
       alert(err.response?.data?.message || "Failed to update booking status");
     }
   };
 
-  // Get status badge class
   const getStatusBadgeClass = (status) => {
     const statusClasses = {
       pending: "bg-warning",
@@ -65,6 +69,41 @@ const RentManagement = () => {
     };
     return `badge ${statusClasses[status.toLowerCase()] || "bg-secondary"}`;
   };
+
+  // Reset all filters
+  const handleResetFilters = () => {
+    setSearchId("");
+    setSearchEmail("");
+    setSearchStartDate("");
+    setSearchEndDate("");
+    setViewType("all");
+  };
+
+  // Filter bookings based on search criteria and view type
+  const filteredBookings = bookings.filter((booking) => {
+    const matchesId = booking._id
+      .toLowerCase()
+      .includes(searchId.toLowerCase());
+    const matchesEmail = booking.email
+      .toLowerCase()
+      .includes(searchEmail.toLowerCase());
+    const matchesStartDate = searchStartDate
+      ? new Date(booking.startDate).toISOString().split("T")[0] ===
+        searchStartDate
+      : true;
+    const matchesEndDate = searchEndDate
+      ? new Date(booking.endDate).toISOString().split("T")[0] === searchEndDate
+      : true;
+    const matchesStatus = viewType === "all" || booking.status === viewType;
+
+    return (
+      matchesId &&
+      matchesEmail &&
+      matchesStartDate &&
+      matchesEndDate &&
+      matchesStatus
+    );
+  });
 
   if (loading) {
     return (
@@ -83,9 +122,95 @@ const RentManagement = () => {
       <div className="admin-section p-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="section-title">Quản lý thuê xe</h2>
-          {/* <Button variant="primary" onClick={() => fetchBookings()}>
-            Refresh
-          </Button> */}
+        </div>
+
+        {/* Search and Filter Section */}
+        <div className="search-filter-container mb-4 p-3 bg-light rounded">
+          <div className="row g-3">
+            <div className="col-md-3">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Tìm theo ID..."
+                value={searchId}
+                onChange={(e) => setSearchId(e.target.value)}
+              />
+            </div>
+
+            <div className="col-md-3">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Tìm theo email..."
+                value={searchEmail}
+                onChange={(e) => setSearchEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="col-md-3">
+              <input
+                type="date"
+                className="form-control"
+                value={searchStartDate}
+                onChange={(e) => setSearchStartDate(e.target.value)}
+                placeholder="Ngày bắt đầu"
+              />
+            </div>
+
+            <div className="col-md-3">
+              <input
+                type="date"
+                className="form-control"
+                value={searchEndDate}
+                onChange={(e) => setSearchEndDate(e.target.value)}
+                placeholder="Ngày kết thúc"
+              />
+            </div>
+          </div>
+
+          {/* Status Filter Buttons */}
+          <div className="row mt-3">
+            <div className="col-md-8">
+              <div className="btn-group">
+                <Button
+                  variant={viewType === "all" ? "primary" : "outline-primary"}
+                  onClick={() => setViewType("all")}>
+                  Tất cả
+                </Button>
+                <Button
+                  variant={
+                    viewType === "pending" ? "warning" : "outline-warning"
+                  }
+                  onClick={() => setViewType("pending")}>
+                  Chờ xử lý
+                </Button>
+                <Button
+                  variant={viewType === "confirmed" ? "info" : "outline-info"}
+                  onClick={() => setViewType("confirmed")}>
+                  Đã xác nhận
+                </Button>
+                <Button
+                  variant={
+                    viewType === "completed" ? "success" : "outline-success"
+                  }
+                  onClick={() => setViewType("completed")}>
+                  Hoàn thành
+                </Button>
+                <Button
+                  variant={
+                    viewType === "cancelled" ? "danger" : "outline-danger"
+                  }
+                  onClick={() => setViewType("cancelled")}>
+                  Đã hủy
+                </Button>
+              </div>
+            </div>
+            <div className="col-md-4 text-end">
+              <Button variant="secondary" onClick={handleResetFilters}>
+                Đặt lại bộ lọc
+              </Button>
+            </div>
+          </div>
         </div>
 
         {error && <Alert variant="danger">{error}</Alert>}
@@ -105,11 +230,10 @@ const RentManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {bookings.map((booking) => (
+              {filteredBookings.map((booking) => (
                 <tr key={booking._id}>
                   <td>{booking._id.slice(-6).toUpperCase()}</td>
                   <td>
-                    {/* <div>{booking.fullName}</div> */}
                     <small className="text-muted">{booking.email}</small>
                   </td>
                   <td>{booking.car?.name || "N/A"}</td>
@@ -121,7 +245,6 @@ const RentManagement = () => {
                       {booking.status}
                     </span>
                   </td>
-
                   <td>
                     <div className="d-flex gap-2">
                       <Button
@@ -145,7 +268,7 @@ const RentManagement = () => {
                   </td>
                 </tr>
               ))}
-              {bookings.length === 0 && (
+              {filteredBookings.length === 0 && (
                 <tr>
                   <td colSpan="8" className="text-center">
                     Không có dữ liệu đặt xe

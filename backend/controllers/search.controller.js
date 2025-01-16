@@ -2,8 +2,9 @@
 import Car from "../models/car.model.js";
 import Booking from "../models/booking.model.js";
 import Fuse from "fuse.js";
+import levenshtein from "fast-levenshtein";
 
-// Helper function to get search suggestions
+//Hàm tìm kiếm phương tiện
 export const searchCars = async (req, res) => {
   try {
     const {
@@ -23,7 +24,6 @@ export const searchCars = async (req, res) => {
 
     // Add filters that don't need fuzzy search
     if (category.trim()) {
-      // Use case-insensitive regex match for category
       carsQuery.category = new RegExp(category.trim(), "i");
     }
     if (brand.trim()) carsQuery.brand = brand;
@@ -33,7 +33,6 @@ export const searchCars = async (req, res) => {
       if (!isNaN(maxPrice)) carsQuery.price.$lte = Number(maxPrice);
     }
 
-    // Check availability if dates are provided
     if (startDate && endDate) {
       const unavailableCars = await Booking.distinct("car", {
         status: { $nin: ["cancelled", "completed"] },
@@ -49,39 +48,30 @@ export const searchCars = async (req, res) => {
       }
     }
 
-    // Get all matching cars before fuzzy search
+    // Get all matching cars
     let cars = await Car.find(carsQuery)
       .select("name brand category price image status description")
       .lean();
 
-    // Apply Fuse.js search if name is provided
+    // Fuzzy search using Levenshtein Distance
     if (name.trim()) {
-      const [brandPart, ...nameParts] = name.split(" ");
-      const searchBrand = brandPart.trim();
-      const searchName = nameParts.join(" ").trim();
+      const searchTerm = name.trim().toLowerCase();
 
-      const fuseOptions = {
-        keys: [
-          { name: "name", weight: 0.5 },
-          { name: "brand", weight: 0.3 },
-          { name: "description", weight: 0.2 },
-        ],
-        includeScore: true,
-        threshold: 0.6,
-        minMatchCharLength: 2,
+      // sử dụng Levenshtein Distance
+      const isSimilar = (input, target) => {
+        const distance = levenshtein.get(input, target);
+        const similarity = 1 - distance / Math.max(input.length, target.length);
+        return similarity >= 0.6; // ngươngx khả dụng
       };
 
-      const fuse = new Fuse(cars, fuseOptions);
-      const searchResult = fuse.search({
-        $or: [{ brand: searchBrand }, { name: searchName }],
-      });
-
-      cars = searchResult
-        .filter((result) => result.score < 0.6)
-        .map((result) => result.item);
+      // Lọc dựa vào Levenshtein similarity
+      cars = cars.filter(
+        (car) =>
+          isSimilar(searchTerm, car.name.toLowerCase()) ||
+          isSimilar(searchTerm, car.brand.toLowerCase())
+      );
     }
 
-    // Manual pagination after fuzzy search
     const total = cars.length;
     const startIndex = (Number(page) - 1) * Number(limit);
     const endIndex = startIndex + Number(limit);
