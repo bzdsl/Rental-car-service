@@ -123,6 +123,16 @@ export const useCarStore = create((set) => ({
       set({ loading: false });
     }
   },
+  searchCars: async (params) => {
+    set({ loading: true });
+    try {
+      const { data } = await axiosInstance.get("/cars/search", { params });
+      set({ cars: data.cars, loading: false });
+    } catch (error) {
+      console.error("Error searching cars:", error);
+      set({ loading: false });
+    }
+  },
 }));
 export const formatPrice = (amount) => {
   return amount

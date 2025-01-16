@@ -7,31 +7,58 @@ import "../../styles/AdminStyle/adminpage.css";
 import { useCarStore, formatPrice } from "../../stores/useCarStore";
 import CreateCarModal from "../../components/UI/Admin/CreateCarModal";
 import { Spinner } from "react-bootstrap";
+import axiosInstance from "../../lib/axios";
 
 const CarManagement = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  const { cars, loading, fetchAllCars, createCar, deleteCar } = useCarStore();
+  const { cars, loading, createCar, deleteCar, searchCars } = useCarStore();
   const navigate = useNavigate();
 
   // Search states
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [uniqueBrands, setUniqueBrands] = useState([]);
+  const [uniqueCategories, setUniqueCategories] = useState([]);
 
-  // Get unique brands and categories for filters
-  const uniqueBrands = [...new Set(cars?.map((car) => car.brand) || [])];
-  const uniqueCategories = [...new Set(cars?.map((car) => car.category) || [])];
-
+  // Fetch initial metadata (brands and categories)
   useEffect(() => {
-    fetchAllCars();
-  }, [fetchAllCars]);
+    const fetchMetadata = async () => {
+      try {
+        const { data } = await axiosInstance.get("/cars/metadata");
+        setUniqueBrands(data.brands);
+        setUniqueCategories(data.categories);
+      } catch (error) {
+        console.error("Error fetching metadata:", error);
+      }
+    };
+    fetchMetadata();
+  }, []);
+
+  // Handle search with debounce
+  useEffect(() => {
+    const debounceTimeout = setTimeout(() => {
+      searchCars({
+        searchTerm,
+        brand: selectedBrand,
+        category: selectedCategory,
+      });
+    }, 300);
+
+    return () => clearTimeout(debounceTimeout);
+  }, [searchTerm, selectedBrand, selectedCategory, searchCars]);
 
   const toggleModal = () => setModalOpen(!modalOpen);
 
   const handleCreateCar = async (newCar) => {
     try {
       await createCar(newCar);
-      fetchAllCars();
+      searchCars({
+        // Refresh search results after creating new car
+        searchTerm,
+        brand: selectedBrand,
+        category: selectedCategory,
+      });
       toggleModal();
     } catch (error) {
       console.error("Error creating a car", error);
@@ -41,17 +68,6 @@ const CarManagement = () => {
   const handleEditCar = (carId) => {
     navigate(`/admin/car-management/edit/${carId}`);
   };
-
-  // Filter cars based on search criteria
-  const filteredCars = cars?.filter((car) => {
-    const matchesSearch = car.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesBrand = !selectedBrand || car.brand === selectedBrand;
-    const matchesCategory =
-      !selectedCategory || car.category === selectedCategory;
-    return matchesSearch && matchesBrand && matchesCategory;
-  });
 
   return (
     <AdminLayout>
@@ -128,8 +144,8 @@ const CarManagement = () => {
                   </div>
                 </td>
               </tr>
-            ) : filteredCars && filteredCars.length > 0 ? (
-              filteredCars.map((car, index) => (
+            ) : cars && cars.length > 0 ? (
+              cars.map((car, index) => (
                 <tr key={car._id}>
                   <td>{index + 1}</td>
                   <td>
@@ -150,7 +166,14 @@ const CarManagement = () => {
                       Chỉnh sửa
                     </button>
                     <button
-                      onClick={() => deleteCar(car._id)}
+                      onClick={() => {
+                        deleteCar(car._id);
+                        searchCars({
+                          searchTerm,
+                          brand: selectedBrand,
+                          category: selectedCategory,
+                        });
+                      }}
                       className="btn btn-danger admin-delete-btn">
                       Xóa
                     </button>
@@ -159,7 +182,9 @@ const CarManagement = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="7">Không có dữ liệu để hiển thị.</td>
+                <td colSpan="7" className="text-center">
+                  Không có dữ liệu để hiển thị.
+                </td>
               </tr>
             )}
           </tbody>

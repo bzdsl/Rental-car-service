@@ -252,7 +252,7 @@ const FindCarForm = () => {
             <option value="4000000-5000000">
               4,000,000 VND - 5,000,000 VND
             </option>
-            <option value="5000000-10000000">Trên 5,000,000 VND</option>
+            <option value="5000000-20000000">Trên 5,000,000 VND</option>
           </Input>
         </FormGroup>
 

@@ -3,7 +3,6 @@
 import { create } from "zustand";
 import axiosInstance from "../lib/axios";
 import { differenceInDays, startOfDay } from "date-fns";
-import toast from "react-hot-toast";
 
 export const useBookingStore = create((set, get) => ({
   bookings: [],
@@ -69,34 +68,6 @@ export const useBookingStore = create((set, get) => ({
     const end = startOfDay(new Date(rentalDates[1]));
 
     return !isNaN(start) && !isNaN(end) && end >= start;
-  },
-
-  calculatePricing: (basePrice, discountCode = "", days = 0) => {
-    const { DISCOUNT_CODES } = get();
-
-    let discountAmount = 0;
-    let totalPrice = basePrice;
-
-    if (discountCode && DISCOUNT_CODES[discountCode]) {
-      const discount = DISCOUNT_CODES[discountCode];
-
-      if (discount.type === "percent") {
-        discountAmount = (discount.value / 100) * basePrice;
-        totalPrice = basePrice - discountAmount;
-      } else if (discount.type === "fixed") {
-        discountAmount = Math.min(discount.value, basePrice);
-        totalPrice = basePrice - discountAmount;
-      }
-    }
-
-    set({
-      pricing: {
-        basePrice,
-        discountAmount,
-        totalPrice: Math.max(totalPrice, 0),
-        rentalDays: days,
-      },
-    });
   },
 
   updateFormData: (field, value) =>
@@ -170,6 +141,19 @@ export const useBookingStore = create((set, get) => ({
     }
   },
 
+  calculatePricing: (basePrice, days = 0) => {
+    let discountAmount = 0;
+    let totalPrice = basePrice;
+
+    set({
+      pricing: {
+        basePrice,
+        discountAmount,
+        totalPrice: Math.max(totalPrice, 0),
+        rentalDays: days,
+      },
+    });
+  },
   calculateInitialPricing: (car, rentalDates) => {
     if (!car || !rentalDates || rentalDates.length !== 2) return false;
 
