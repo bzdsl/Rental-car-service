@@ -12,6 +12,7 @@ import revenueRouthes from "./routes/revenue.route.js";
 import userRoutes from "./routes/user.route.js";
 import bookingRoutes from "./routes/booking.route.js";
 import categoryRoutes from "../backend/routes/search.route.js";
+import path from "path";
 
 import { connectDB } from "./lib/db.js";
 
