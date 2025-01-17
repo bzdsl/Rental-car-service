@@ -8,7 +8,7 @@ import {
   formatPrice,
   formatDate,
 } from "../stores/useBookingStore";
-import "../styles/rentalinfo.css";
+import "../styles/rentalInfo.css";
 import Header from "../components/Header/Header";
 
 const RentalInfo = () => {
