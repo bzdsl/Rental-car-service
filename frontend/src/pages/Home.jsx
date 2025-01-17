@@ -8,7 +8,7 @@ import FindCarForm from "../components/UI/FindCarForm";
 import ServicesList from "../components/UI/ServicesList";
 import TopRentedCars from "../components/UI/TopRentedCars";
 import Category from "../components/UI/Category";
-import Header from "../components/header/Header";
+import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import { useCarStore } from "../stores/useCarStore";
 

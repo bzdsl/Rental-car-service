@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import Helmet from "../components/Helmet/Helmet";
 import CarItem from "../components/UI/CarItem";
-import Header from "../components/header/Header";
+import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import { useCarStore } from "../stores/useCarStore";
 import { Spinner } from "react-bootstrap";

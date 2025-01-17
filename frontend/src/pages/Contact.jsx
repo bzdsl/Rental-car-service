@@ -4,7 +4,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Form, FormGroup, Input } from "reactstrap";
 import Helmet from "../components/Helmet/Helmet";
-import Header from "../components/header/Header";
+import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import "../styles/contact.css";
 
