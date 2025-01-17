@@ -41,7 +41,7 @@ export const validateCoupon = async (req, res) => {
       message: "Mã khuyến mãi hợp lệ",
       code: coupon.code,
       discount: coupon.discount,
-      type: "percent", // Thêm type để frontend biết cách tính
+      type: "percent",
     });
   } catch (error) {
     console.error("Error in validateCoupon controller:", error.message);

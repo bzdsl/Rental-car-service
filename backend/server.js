@@ -23,6 +23,7 @@ const app = express();
 const PORT = process.env.PORT || 3000; // Default to 3000 if PORT is not set
 app;
 
+const __dirname = path.resolve();
 // Use the auth routes
 app.use(express.json({ limit: "10mb" }));
 app.use(cookiesParser());
@@ -35,6 +36,14 @@ app.use("/api/revenues", revenueRouthes);
 app.use("/api/users", userRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api", categoryRoutes);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  });
+}
 
 app.listen(PORT, () => {
   console.log("Server is running on port http://localhost:" + PORT);
