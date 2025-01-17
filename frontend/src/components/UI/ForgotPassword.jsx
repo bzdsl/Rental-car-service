@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import { motion } from "framer-motion";
 import { FiMail } from "react-icons/fi";
-import Header from "../header/Header";
+import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 
 const ForgotPassword = () => {
