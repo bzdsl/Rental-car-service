@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Form, FormGroup, Label, Input, Button } from "reactstrap";
 import { useUserStore } from "../stores/useUserStore"; // import đúng store
 import axiosInstance from "../lib/axios";
-import Header from "../components/header/Header";
+import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-hot-toast";
 
