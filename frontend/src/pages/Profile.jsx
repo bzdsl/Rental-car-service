@@ -6,6 +6,7 @@ import { useUserStore } from "../stores/useUserStore"; // import đúng store
 import axiosInstance from "../lib/axios";
 import Header from "../components/header/Header";
 import Footer from "../components/Footer/Footer";
+import { toast } from "react-hot-toast";
 
 const Profile = () => {
   const { user, set } = useUserStore(); // Lấy set từ store, không phải setUser
@@ -21,6 +22,7 @@ const Profile = () => {
     phone: false,
     password: false,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -39,35 +41,35 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const res = await axiosInstance.put("/auth/profile", formData, {
         withCredentials: true,
       });
 
-      console.log("Response:", res); // Kiểm tra dữ liệu trả về từ API
-
-      // Kiểm tra nếu res.status là 200 hoặc 201
-      if (res.status === 200 || res.status === 201) {
-        set({ user: res.data }); // Cập nhật user trong store bằng set
-        alert("Thông tin đã được cập nhật thành công!");
-        setFormData({
-          name: res.data.name,
-          email: res.data.email,
-          phone: res.data.phone,
+      if (res.data.user) {
+        useUserStore.setState((state) => ({
+          ...state,
+          user: {
+            ...state.user,
+            ...res.data.user,
+          },
+        }));
+        setEditMode({
+          name: false,
+          email: false,
+          phone: false,
+          password: false,
         });
-      } else {
-        console.log("Status khác 200 hoặc 201:", res.status); // Kiểm tra khi không phải 200/201
-        alert("Cập nhật thông tin không thành công!");
+        toast.success("Thông tin đã được cập nhật thành công!");
       }
     } catch (err) {
-      // In lỗi chi tiết hơn
-      if (err.response) {
-        console.log("Lỗi từ server:", err.response.data);
-        alert(
-          err.response.data.message || "Cập nhật thông tin không thành công!"
-        );
-      } else {
-      }
+      toast.error(
+        err.response?.data?.message || "Cập nhật thông tin không thành công!"
+      );
+      console.error("Error updating profile:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -149,8 +151,12 @@ const Profile = () => {
           </FormGroup>
 
           <div className="mb-2">
-            <Button type="submit" color="danger" className="px-4">
-              Cập nhật
+            <Button
+              type="submit"
+              color="danger"
+              className="px-4"
+              disabled={isSubmitting}>
+              {isSubmitting ? "Đang cập nhật..." : "Cập nhật"}
             </Button>
           </div>
         </Form>
