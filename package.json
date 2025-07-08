@@ -13,6 +13,7 @@
   "type": "module",
   "license": "ISC",
   "dependencies": {
+    "@upstash/redis": "^1.35.1",
     "axios": "^1.7.8",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
