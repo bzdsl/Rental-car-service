@@ -26,7 +26,7 @@ A full-stack car rental web application that allows users to browse available ca
 ### 1. Clone the repository
 
 ```
-git clone https://github.com/yourusername/car-rental-service.git
+git clone https://github.com/bzdsl/Rental-car-service.git
 cd car-rental-service
 ```
 
