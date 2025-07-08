@@ -45,6 +45,7 @@ JWT_SECRET=jwt_secret
 CLOUDINARY_CLOUD_NAME=cloudinary_name
 CLOUDINARY_API_KEY=cloudinary_api_key
 CLOUDINARY_API_SECRET=cloudinary_api_secret
+STRIPE_SECRET_KEY=stripe_api_key
 ```
 
 Start the backend server:
