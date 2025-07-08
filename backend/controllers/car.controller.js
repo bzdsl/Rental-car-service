@@ -23,6 +23,7 @@ export const getFeaturedCars = async (req, res) => {
 
     //if not in redis, fetch from mongodb
     //.lean() is going to return a plain js object instead of mongodb document
+
     featuredCars = await Car.find({ isFeatured: true }).lean();
 
     if (!featuredCars) {

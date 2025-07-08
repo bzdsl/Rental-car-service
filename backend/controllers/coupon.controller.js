@@ -35,7 +35,7 @@ export const validateCoupon = async (req, res) => {
       return res.status(400).json({ message: "Mã khuyến mãi đã hết hạn" });
     }
 
-    // Nếu mã giảm giá hợp lệ, đảm bảo trả về đúng format
+    // Nếu mã giảm giá hợp lệ, đảm bảo trả  về đúng format
     return res.json({
       validUntil: true, // Thêm trường valid
       message: "Mã khuyến mãi hợp lệ",

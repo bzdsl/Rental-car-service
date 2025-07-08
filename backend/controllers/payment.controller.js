@@ -5,7 +5,6 @@ import Booking from "../models/booking.model.js";
 import { stripe } from "../lib/stripe.js";
 
 // Controller to create a Stripe checkout session
-
 export const createCheckoutSession = async (req, res) => {
   try {
     const { cars, couponCode } = req.body;
